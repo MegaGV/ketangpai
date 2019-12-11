@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+			PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+			"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="ketangpai.dao.UserDao">
+
+	<resultMap type="ketangpai.entity.User" id="userMap">
+		<id property="account" column="account" jdbcType="VARCHAR"/>
+		<result property="password" column="password" jdbcType="VARCHAR"/>
+		<result property="name" column="name" jdbcType="VARCHAR"/>
+		<result property="identity" column="identity" jdbcType="VARCHAR"/>
+		<result property="school" column="school" jdbcType="VARCHAR"/>
+		<result property="schoolID" column="schoolID" jdbcType="VARCHAR"/>
+		<result property="email" column="email" jdbcType="VARCHAR"/>
+		<result property="phone" column="phone" jdbcType="VARCHAR"/>
+		<result property="courses" column="courses" jdbcType="VARCHAR"/>
+		<result property="fieldcourses" column="fieldcourses" jdbcType="VARCHAR"/>
+	</resultMap>
+	
+	<select id="getUserByAccount" resultType="ketangpai.entity.User">
+		select * from user where account = #{account}
+	</select>
+	
+	<insert id="register" useGeneratedKeys="true" parameterType="ketangpai.entity.User">
+		insert into user 
+		<trim prefix="(" suffix=")" suffixOverrides="," >
+			account,password,name,identity,school
+			<if test="schoolID != null">
+				,schoolID
+			</if>
+			<if test="email != null">
+				,email
+			</if>
+			<if test="phone != null">
+				,phone
+			</if>
+			<if test="courses != null">
+				,courses
+			</if>
+			<if test="fieldcourses != null">
+				,fieldcourses
+			</if>
+		</trim>
+		<trim prefix="values (" suffix=")" suffixOverrides="," >
+			#{account, jdbcType=VARCHAR},
+			#{password, jdbcType=VARCHAR},
+			#{name, jdbcType=VARCHAR},
+			#{identity, jdbcType=VARCHAR},
+			#{school, jdbcType=VARCHAR}
+			<if test="schoolID != null" >
+            	,#{schoolID, jdbcType=VARCHAR}
+            </if>
+			<if test="email != null" >
+            	,#{email, jdbcType=VARCHAR}
+            </if>
+            <if test="phone != null" >
+            	,#{phone, jdbcType=VARCHAR}
+            </if>
+            <if test="courses != null" >
+            	,#{courses, jdbcType=VARCHAR}
+            </if>
+            <if test="fieldcourses != null" >
+            	,#{fieldcourses, jdbcType=VARCHAR}
+            </if>
+		</trim>
+	</insert>
+	
+</mapper>
