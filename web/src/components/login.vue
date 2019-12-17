@@ -3,13 +3,11 @@
         <div class="reg-log" >
             <el-form ref="user" :model="user" class="login-box" id="login">
                 <div class="items">       
-                    <a class="active">账号登录&nbsp;</a>|
-                    <a>&nbsp;手机短信登录&nbsp;</a>|
-                    <a>&nbsp;微信登录&nbsp;</a>
+                    <a class="active">账号登录</a>
                 </div>
                 <div class="padding-cont pt-login">
                     <el-form-item >
-                        <el-input v-model="user.account" type="text" placeholder="邮箱/账号/手机号"></el-input>
+                        <el-input v-model="user.account" type="text" placeholder="账号"></el-input>
                     </el-form-item>
                     <el-form-item>
                         <el-input v-model="user.password" type="password" placeholder="密码"></el-input>

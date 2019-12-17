@@ -23,6 +23,7 @@ public class UserController {
 	@PostMapping("/register")
 	@ResponseBody
 	public void register(@RequestBody User user) {
+		System.out.println("!!!");
 		service.register(user);
 	}
 	

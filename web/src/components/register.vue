@@ -42,7 +42,7 @@
                         </el-select>
                     </el-form-item>
                     <el-form-item>
-                        <el-input type="text" v-model="user.schoolID" placeholder="学号"></el-input>
+                        <el-input type="text" v-model="user.schoolId" placeholder="学号"></el-input>
                     </el-form-item>
                     <el-form-item>
                         <el-input type="text" v-model="user.phone" placeholder="电话"></el-input>
@@ -102,7 +102,17 @@ export default {
   },
   methods: {
       identityChange(identity){
-          this.user.identity = identity;
+        this.user.account = "";
+        this.user.password = "";
+        this.user.name = "";
+        this.user.identity = identity;
+        this.user.school= "";
+        this.user.schoolId= "";
+        this.user.email= "";
+        this.user.phone= "";
+        this.user.courses= "";
+        this.user.fieldcourses= "";
+        
       },
       register(){
             this.$axios
