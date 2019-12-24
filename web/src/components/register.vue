@@ -130,7 +130,7 @@ export default {
 }
 </script>
 
-<style>
+<style >
 .reg-logs{
     width: 480px;
     height: 515px;

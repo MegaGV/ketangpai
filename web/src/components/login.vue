@@ -47,7 +47,9 @@ export default {
   },
   methods: {
     login() {
-      this.$axios
+        alert("登陆成功")
+        this.$router.push('/student')
+      /*this.$axios
         .post("api/login", qs.stringify(this.user), {
           headers: {
             'Content-Type':'application/x-www-form-urlencoded',
@@ -55,19 +57,19 @@ export default {
         })
         .then(res => {
           alert("登录成功");
-          this.$router.push('/index')
+          this.$router.push('/student')
       })
       .catch(err => {
         alert(err.response.data.msg);
         console.log(err);
-      });
+      });*/
     },
   },
   
 }
 </script>
 
-<style>
+<style >
 .reg-log{
     width: 480px;
     height: 515px;

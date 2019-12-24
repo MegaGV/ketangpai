@@ -9,6 +9,9 @@
                 <a class="active">课堂</a>
             </li>
             <li class="nav-menu-item">
+                <a>备课区</a>
+            </li>
+            <li class="nav-menu-item">
                 <a>精品专区</a>
             </li>
             <li class="nav-menu-item">
@@ -32,6 +35,9 @@
                 </el-badge>
             </li>
             <li class="nav-menu-right-item">
+                <a style="cursor:pointer;font-size:20px;line-height:52px" class="el-icon-s-custom">邀请教师</a>
+            </li>
+            <li class="nav-menu-right-item">
                 <a style="cursor:pointer;font-size:20px;line-height:52px" class="el-icon-document">论文查重</a>
             </li>
         </ul>
@@ -39,7 +45,8 @@
     <div class="courses">
         <div class="courses_top">
             <p style="float:left;height: 36px;line-height: 36px;">全部课程</p>
-            <el-button size="small" type="primary" style="float:right" @click="join_class">+ 加入课程</el-button>
+            <el-button size="small" type="primary" style="float:right">快速发布活动</el-button>
+            <el-button size="small" type="primary" style="float:right;margin-right:10px;" @click="join_class">+ 创建/加入课程</el-button>
             <div style="float:right">
                 <ul>
                     <li style="float:right;margin-right:10px;cursor:pointer" @click="fieldsort_visible = true;fieldsort_part = 'field'">
@@ -56,7 +63,7 @@
         <el-card v-for="course in courses" v-bind:key="course.id" class="course_card" :body-style="{ padding: '0px' }">
             <div class="course_card_top" :style="coursebk">
                 <strong class="jump_to_class" >
-                    <router-link style="text-decoration: none;color:white" :to="{ path: '/student/course/' + course.id}">{{course.name}}</router-link>
+                    <router-link style="text-decoration: none;color:white" :to="{ path: '/teacher/course/' + course.id}">{{course.name}}</router-link>
                     <div>{{course.introduce}}</div>
                 </strong>
                 <p class="code">加课码：{{course.code}}</p>
@@ -71,12 +78,15 @@
             </ul>
             <div class="course_card_foot">
                 <el-avatar icon="el-icon-user-solid" :size="20" style="float:left;"></el-avatar>
-                <span style="float:left;">{{course.teacher}}</span> 
+                <span style="float:left;">成员{{course.member}}人</span> 
                 <el-dropdown style="float:right">
                     <span style="cursor:pointer;color:blue">更多</span>
                     <el-dropdown-menu slot="dropdown">
+                        <el-dropdown-item >编辑</el-dropdown-item>
+                        <el-dropdown-item @click.native="delete_class">删除</el-dropdown-item>
                         <el-dropdown-item @click.native="file_class">归档</el-dropdown-item>
-                        <el-dropdown-item @click.native="exit_class">退课</el-dropdown-item>
+                        <el-dropdown-item >复制课程</el-dropdown-item>
+                        <el-dropdown-item >打包下载</el-dropdown-item>
                     </el-dropdown-menu>
                 </el-dropdown>
                 <span style="float:right;font-size:10px;margin-right:10px">置顶</span>
@@ -86,8 +96,8 @@
             <div class="course_card_top" :style="joinbk">
             </div>
             <div>
-                <div style="text-align:center;margin:55px;cursor:pointer" >
-                    <p @click="join_class">+<br>加入课程</p>
+                <div style="text-align:center;margin:55px;cursor:pointer" @click="open_courseinfo">
+                    <p>+<br>创建课程</p>
                 </div>
             </div>
         </el-card>
@@ -108,24 +118,50 @@
                     <strong class="jump_to_class2" >
                         <div>{{fieldcourse.name}}&nbsp;{{fieldcourse.introduce}}</div>
                     </strong>
-                    <p class="code2">角色:学生&nbsp;老师:{{fieldcourse.teacher}}</p>
+                    <p class="code2">角色:老师</p>
                     <el-dropdown style="float:right">
                         <i style="font-size:30px;color:white" class="el-icon-more"></i>
                         <el-dropdown-menu slot="dropdown">
                             <el-dropdown-item @click.native="unfile_class">恢复</el-dropdown-item>
-                            <el-dropdown-item @click.native="exit_class">退课</el-dropdown-item>
+                            <el-dropdown-item @click.native="delete_class">删除</el-dropdown-item>
                         </el-dropdown-menu>
                     </el-dropdown>
                 </el-card>
             </el-tab-pane>
         </el-tabs>
     </el-dialog>
-
     <el-dialog title="要归档此课程吗" :visible.sync="field_visible" width="20%">
-        <span>您可以在“课堂”-“归档管理”中查看此课程</span>
+        <span>
+            您可以在“课堂”-“归档管理”中查看此课程<br>
+            【归档全部】学生的课程也会一起被归档<br>
+            【归档自己】学生的课程不会被归档
+        </span>
+        
         <span slot="footer" class="dialog-footer">
             <el-button @click="field_visible = false">取消</el-button>
-            <el-button type="primary" @click="field_visible = false">归档</el-button>
+            <el-button @click="field_visible = false">归档全部</el-button>
+            <el-button type="primary" @click="field_visible = false">归档自己</el-button>
+        </span>
+    </el-dialog>
+    <el-dialog tirle="课程信息" :visible.sync="course_visible" width="30%" :before-close="close_courseinfo">
+        <el-form ref="course_info" :model="course_info" label-width="80px" style="margin: 0 auto">
+            <el-form-item label="课程编号" prop="id">
+                <el-input v-model="course_info.id" style="width:240px;" v-bind:disabled="courseId_disabled" ></el-input>
+            </el-form-item>
+            <el-form-item label="课程名" prop="name">
+                <el-input v-model="course_info.name" style="width:240px;"></el-input>
+            </el-form-item>
+            <el-form-item label="课程简介" prop="introduce">
+                <el-input v-model="course_info.introduce" style="width:240px;"></el-input>
+            </el-form-item>
+            <el-form-item label="加课码" prop="code">
+                <el-input v-model="course_info.code" style="width:240px;"></el-input>
+            </el-form-item>
+        </el-form>
+
+        <span slot="footer" class="dialog-footer">
+            <el-button @click="close_courseinfo">取消</el-button>
+            <el-button type="primary" @click="close_courseinfo">提交</el-button>
         </span>
     </el-dialog>
 </div>
@@ -141,29 +177,41 @@ export default {
             coursebk:{backgroundImage: "url(" + require("../img/04.png") + ")",},
             fieldcoursebk:{backgroundImage: "url(" + require("../img/10.jpg") + ")",},
             joinbk:{backgroundImage: "url(" + require("../img/create-course.png") + ")",},
+
             fieldsort_visible:false,
             fieldsort_part:"",
+
             field_visible:false,
 
+            course_visible:false,
+            courseId_disabled:false,
+
             user:{
-                account: "stu",
-                name: "张三",
-                identity: "student",
+                account: "xcy",
+                name: "徐传运",
+                identity: "teacher",
                 school: "重庆理工大学",
-                schoolId: "11703080201",
                 email: "",
                 phone: "",
-                courses: ["001","002"],
-                fieldcourses: [],
+                courses: ["001"],
+                fieldcourses: ["003"],
+            },
+            course_info:{
+                id:"",
+                name:"",
+                introduce:"",
+                code:"",
             },
             courses:[
-                    {id: "001", name: "JavaEE", introduce: "117030802", code: "TY94UW", teacher: "徐传运", homeworks:[{id:"001", name:"实验1"}]},
-                    {id: "002", name: "UML", introduce: "1738-2", code: "MHZ96P", teacher: "徐传运2", homeworks:[]},
+                {id: "001", name: "JavaEE", introduce: "117030802", code: "TY94UW", member:"2", homeworks:[{id:"001", name:"实验1"}]},
             ],
             fieldcourses: [
-                {id: "001", name:"Alogrim", introduce: "117030801、02", code: "NXWR4W", teacher: "徐传运",homeworks:[]},
+                {id: "003", name:"Alogrim", introduce: "117030801、02", code: "NXWR4W", teacher: "徐传运",homeworks:[]},
             ],
         }
+    },
+    computed:{
+
     },
     methods: {
         join_class(){
@@ -185,6 +233,24 @@ export default {
         unfile_class(){
             this.$confirm('此课程会在课堂页上显示。', '要恢复此课程么？', {
                 confirmButtonText: '恢复',
+                cancelButtonText: '取消',
+                type: 'warning'
+            })
+        },
+        open_courseinfo(){
+            this.course_visible = true;
+            if(this.course_info.id == "")
+                this.courseId_disabled = false;
+            else
+                this.courseId_disabled = true;
+        },
+        close_courseinfo(){
+            this.course_visible = false;
+            this.$refs['course_info'].resetFields();
+        },
+        delete_class(){
+            this.$confirm('你将删除本门课程，确定吗?', '删除', {
+                confirmButtonText: '确定',
                 cancelButtonText: '取消',
                 type: 'warning'
             })
@@ -260,7 +326,6 @@ li {
     display: list-item;
     list-style: none;
 }
-
 .courses {
     height: 100%;
     overflow: hidden;
