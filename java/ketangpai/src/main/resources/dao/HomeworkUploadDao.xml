@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+			PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+			"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="ketangpai.dao.HomeworkUploadDao">
+
+	<resultMap type="ketangpai.entity.Homework_upload" id="homeworkUploadMap">
+		<id property="id" column="id" jdbcType="INTEGER" />
+		<result property="content" column="content" jdbcType="VARCHAR"/>
+		<result property="file" column="file" jdbcType="VARCHAR"/>
+		<result property="student" column="student" jdbcType="INTEGER"/>
+		<result property="homework" column="homework" jdbcType="INTEGER"/>
+		<result property="score" column="score" jdbcType="INTEGER"/>
+		<result property="complete" column="complete" jdbcType="INTEGER"/>
+		<result property="review" column="review" jdbcType="INTEGER"/>
+		<result property="upload_date" column="upload_date" jdbcType="TIMESTAMP"/>
+	</resultMap>
+	
+	<select id="getHomeworkUploadById" resultType="ketangpai.entity.Homework_upload">
+		select * from homework_upload where student = #{id} AND homework = #{hid}
+	</select>
+	
+	
+</mapper>

@@ -4,5 +4,6 @@ import ketangpai.entity.User;
 
 public interface UserService {
 	public void register(User user);
-	public User getUserByAccount(String account);
+	public String login(String username, String password);
+	public User getUserById(Integer id);
 }

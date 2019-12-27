@@ -5,7 +5,8 @@
 <mapper namespace="ketangpai.dao.UserDao">
 
 	<resultMap type="ketangpai.entity.User" id="userMap">
-		<id property="account" column="account" jdbcType="VARCHAR"/>
+		<id property="id" column="id" jdbcType="INTEGER" />
+		<result property="username" column="username" jdbcType="VARCHAR"/>
 		<result property="password" column="password" jdbcType="VARCHAR"/>
 		<result property="name" column="name" jdbcType="VARCHAR"/>
 		<result property="identity" column="identity" jdbcType="VARCHAR"/>
@@ -17,32 +18,34 @@
 		<result property="fieldcourses" column="fieldcourses" jdbcType="VARCHAR"/>
 	</resultMap>
 	
-	<select id="getUserByAccount" resultType="ketangpai.entity.User">
-		select * from user where account = #{account}
+	<select id="getUserById" resultType="ketangpai.entity.User">
+		select * from user where id = #{id}
 	</select>
 	
-	<insert id="register" useGeneratedKeys="true" parameterType="ketangpai.entity.User">
+	<select id="getUserByUsername" resultType="ketangpai.entity.User">
+		select * from user where username = #{username}
+	</select>
+	
+	<select id="getUserCourses" resultType="java.lang.String">
+		select courses from user where id = #{id}
+	</select>
+	
+	<select id="getUserFieldCourses" resultType="java.lang.String">
+		select fieldcourses from user where id = #{id}
+	</select>
+	
+	<insert id="register" parameterType="ketangpai.entity.User" useGeneratedKeys="true" keyProperty="id">
 		insert into user 
 		<trim prefix="(" suffix=")" suffixOverrides="," >
-			account,password,name,identity,school
-			<if test="schoolID != null">
-				,schoolID
-			</if>
-			<if test="email != null">
-				,email
-			</if>
-			<if test="phone != null">
-				,phone
-			</if>
-			<if test="courses != null">
-				,courses
-			</if>
-			<if test="fieldcourses != null">
-				,fieldcourses
-			</if>
+			username,password,name,identity,school
+			<if test="schoolID != null">,schoolID</if>
+			<if test="email != null">,email</if>
+			<if test="phone != null">,phone</if>
+			<if test="courses != null">,courses</if>
+			<if test="fieldcourses != null">,fieldcourses</if>
 		</trim>
 		<trim prefix="values (" suffix=")" suffixOverrides="," >
-			#{account, jdbcType=VARCHAR},
+			#{username, jdbcType=VARCHAR},
 			#{password, jdbcType=VARCHAR},
 			#{name, jdbcType=VARCHAR},
 			#{identity, jdbcType=VARCHAR},
@@ -64,5 +67,17 @@
             </if>
 		</trim>
 	</insert>
+	
+	<update id="updateCourses" >
+		update user set
+		courses = #{courses}
+		where id = #{id}
+	</update>
+	
+	<update id="updateFieldCourses" >
+		update user set
+		fieldcourses = #{fieldcourses}
+		where id = #{id}
+	</update>
 	
 </mapper>

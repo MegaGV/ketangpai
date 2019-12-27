@@ -46,7 +46,7 @@
         <div class="courses_top">
             <p style="float:left;height: 36px;line-height: 36px;">全部课程</p>
             <el-button size="small" type="primary" style="float:right">快速发布活动</el-button>
-            <el-button size="small" type="primary" style="float:right;margin-right:10px;" @click="join_class">+ 创建/加入课程</el-button>
+            <el-button size="small" type="primary" style="float:right;margin-right:10px;" @click="open_courseinfo()">+ 创建/加入课程</el-button>
             <div style="float:right">
                 <ul>
                     <li style="float:right;margin-right:10px;cursor:pointer" @click="fieldsort_visible = true;fieldsort_part = 'field'">
@@ -71,20 +71,20 @@
             <ul class="course_card_homework">
                 <li style="text-align:left">
                     <span>近期作业</span>
-                    </li>
-                <li v-for="homework in course.homeworks" v-bind:key="homework.id" style="text-align:left">
-                    <a>{{homework.name}}</a>
+                </li>
+                <li v-for="homework in course.homeworks" v-bind:key="homework" style="text-align:left">
+                    <a>实验{{homework}}</a>
                 </li>
             </ul>
             <div class="course_card_foot">
                 <el-avatar icon="el-icon-user-solid" :size="20" style="float:left;"></el-avatar>
-                <span style="float:left;">成员{{course.member}}人</span> 
+                <span style="float:left;">成员</span> 
                 <el-dropdown style="float:right">
                     <span style="cursor:pointer;color:blue">更多</span>
                     <el-dropdown-menu slot="dropdown">
-                        <el-dropdown-item >编辑</el-dropdown-item>
-                        <el-dropdown-item @click.native="delete_class">删除</el-dropdown-item>
-                        <el-dropdown-item @click.native="file_class">归档</el-dropdown-item>
+                        <el-dropdown-item @click.native="open_courseinfo(course.id, course.name, course.code, course.introduce)">编辑</el-dropdown-item>
+                        <el-dropdown-item @click.native="delete_class(course.id)">删除</el-dropdown-item>
+                        <el-dropdown-item @click.native="file_class(course.id)">归档</el-dropdown-item>
                         <el-dropdown-item >复制课程</el-dropdown-item>
                         <el-dropdown-item >打包下载</el-dropdown-item>
                     </el-dropdown-menu>
@@ -96,7 +96,7 @@
             <div class="course_card_top" :style="joinbk">
             </div>
             <div>
-                <div style="text-align:center;margin:55px;cursor:pointer" @click="open_courseinfo">
+                <div style="text-align:center;margin:55px;cursor:pointer" @click="open_courseinfo()">
                     <p>+<br>创建课程</p>
                 </div>
             </div>
@@ -140,14 +140,11 @@
         <span slot="footer" class="dialog-footer">
             <el-button @click="field_visible = false">取消</el-button>
             <el-button @click="field_visible = false">归档全部</el-button>
-            <el-button type="primary" @click="field_visible = false">归档自己</el-button>
+            <el-button type="primary" @click="file_class2">归档自己</el-button>
         </span>
     </el-dialog>
     <el-dialog tirle="课程信息" :visible.sync="course_visible" width="30%" :before-close="close_courseinfo">
         <el-form ref="course_info" :model="course_info" label-width="80px" style="margin: 0 auto">
-            <el-form-item label="课程编号" prop="id">
-                <el-input v-model="course_info.id" style="width:240px;" v-bind:disabled="courseId_disabled" ></el-input>
-            </el-form-item>
             <el-form-item label="课程名" prop="name">
                 <el-input v-model="course_info.name" style="width:240px;"></el-input>
             </el-form-item>
@@ -161,7 +158,7 @@
 
         <span slot="footer" class="dialog-footer">
             <el-button @click="close_courseinfo">取消</el-button>
-            <el-button type="primary" @click="close_courseinfo">提交</el-button>
+            <el-button type="primary" @click="create_class">提交</el-button>
         </span>
     </el-dialog>
 </div>
@@ -184,69 +181,132 @@ export default {
             field_visible:false,
 
             course_visible:false,
-            courseId_disabled:false,
 
-            user:{
-                account: "xcy",
-                name: "徐传运",
-                identity: "teacher",
-                school: "重庆理工大学",
-                email: "",
-                phone: "",
-                courses: ["001"],
-                fieldcourses: ["003"],
-            },
+            readytofile:"",
+
+            user:{},
             course_info:{
                 id:"",
                 name:"",
                 introduce:"",
                 code:"",
+                teacher:"",
             },
-            courses:[
-                {id: "001", name: "JavaEE", introduce: "117030802", code: "TY94UW", member:"2", homeworks:[{id:"001", name:"实验1"}]},
-            ],
-            fieldcourses: [
-                {id: "003", name:"Alogrim", introduce: "117030801、02", code: "NXWR4W", teacher: "徐传运",homeworks:[]},
-            ],
+            courses:[],
+            fieldcourses: [],
         }
     },
     computed:{
 
     },
     methods: {
-        join_class(){
-            this.$prompt('请输入加课码', '加入课程', {
-                confirmButtonText: '加入',
-                cancelButtonText: '取消'
+        courseInitial(){
+            this.getAllCourses(this.user.courses.join(','))
+            this.getAllFieldCourses(this.user.fieldcourses.join(','))
+        },
+        getUserById(id) {
+            this.$axios.get('api/UserController/getUserById?id=' + id)
+            .then(res => {
+                this.user = res.data
+                this.user.courses = this.user.courses.split(",");
+                this.user.fieldcourses = this.user.fieldcourses.split(",");
+
+                this.courseInitial();
+            })
+            .catch(err => {
+                alert("获取用户失败");
+                console.log(err);
             })
         },
-        exit_class(){
-            this.$confirm('你将退选本门课程，确定吗?', '退课', {
-                confirmButtonText: '确定',
-                cancelButtonText: '取消',
-                type: 'warning'
+        getAllCourses(courses){
+            this.$axios.get('api/CourseController/getAllCourses?courses=' + courses)
+            .then(res => {
+                this.courses = res.data;
+            })
+            .catch(err => {
+                alert("获取课程失败");
+                console.log(err);
             })
         },
-        file_class(){
+        getAllFieldCourses(courses){
+            this.$axios.get('api/CourseController/getAllCourses?courses=' + courses)
+            .then(res => {
+                this.fieldcourses = res.data;
+            })
+            .catch(err => {
+                alert("获取课程失败");
+                console.log(err);
+            })
+        },
+        file_class(id){
             this.field_visible = true;
+            this.readytofile = id;
         },
-        unfile_class(){
+        file_class2(){
+            this.$axios.post('api/CourseController/fileCourse?id=' + this.user.id + "&cid="+ this.readytofile)
+            .then(res => {
+                alert("归档成功");
+                this.field_visible = false;
+                this.getUserById(5);
+            })
+            .catch(err => {
+                alert("归档失败");
+                console.log(err);
+            })
+        },
+        unfile_class(cid){
             this.$confirm('此课程会在课堂页上显示。', '要恢复此课程么？', {
                 confirmButtonText: '恢复',
                 cancelButtonText: '取消',
                 type: 'warning'
-            })
+            }).then(() => {
+                this.$axios.post('api/CourseController/unfileCourse?id=' + this.user.id + "&cid=" + cid)
+                    .then(res => {
+                        alert("恢复成功");
+                        this.fieldsort_visible = false;
+                        this.getUserById(5);
+                    })
+                    .catch(err => {
+                        alert("恢复失败");
+                        console.log(err);
+                    })
+                }).catch(() => {
+                    this.$message({
+                        type: 'info',
+                        message: '取消恢复'
+                    });
+            });
         },
-        open_courseinfo(){
+        open_courseinfo(cid, name, code, introduce){
             this.course_visible = true;
-            if(this.course_info.id == "")
-                this.courseId_disabled = false;
-            else
-                this.courseId_disabled = true;
+            this.course_info.teacher = this.user.id;
+            if(cid != null){
+                this.course_info.id = cid;
+                this.course_info.name = name;
+                this.course_info.code = code;
+                this.course_info.introduce = introduce;
+            }
+                
         },
         close_courseinfo(){
             this.course_visible = false;
-            this.$refs['course_info'].resetFields();
+            this.course_info.id = "";
+            this.course_info.name = "";
+            this.course_info.introduce = "";
+            this.course_info.code = "";
+        },
+        create_class(){
+            this.$axios
+                .post("api/CourseController/createCourse", this.course_info)
+                .then(res => {
+                    alert("新建成功");
+                    this.getUserById(5);
+                    this.close_courseinfo();
+            })
+            .catch(err => {
+                alert("注册失败");
+                console.log(err);
+            });
         },
         delete_class(){
             this.$confirm('你将删除本门课程，确定吗?', '删除', {
@@ -265,6 +325,9 @@ export default {
             });
         }
     },
+    mounted(){
+        this.getUserById(5);
+    }
 }
 </script>
 

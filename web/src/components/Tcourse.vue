@@ -136,7 +136,7 @@ export default {
             dir: "ltr",
             activeIndex: '2',
             user:{
-                account: "xcy",
+                username: "xcy",
                 name: "徐传运",
                 identity: "teacher",
                 school: "重庆理工大学",

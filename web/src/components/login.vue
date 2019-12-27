@@ -7,7 +7,7 @@
                 </div>
                 <div class="padding-cont pt-login">
                     <el-form-item >
-                        <el-input v-model="user.account" type="text" placeholder="账号"></el-input>
+                        <el-input v-model="user.username" type="text" placeholder="账号"></el-input>
                     </el-form-item>
                     <el-form-item>
                         <el-input v-model="user.password" type="password" placeholder="密码"></el-input>
@@ -17,7 +17,7 @@
                         <a class="forget" style="float:right">忘记密码？</a>
                     </el-form-item>
                     <el-form-item>
-                        <el-button type="primary" @click="login" style="height: 50px;width:420px;">登录</el-button>
+                        <el-button type="primary" @click="submit" style="height: 50px;width:420px;">登录</el-button>
                     </el-form-item>
                     
                     <router-link to="/register" class="btn-register">
@@ -42,14 +42,15 @@ export default {
             backgroundRepeat:'no-repeat',
             backgroundSize:'cover'
         },
-        user:{},
-        }
+        user:{
+            username:"",
+            password:"",
+        },
+    }
   },
   methods: {
     login() {
-        alert("登陆成功")
-        this.$router.push('/student')
-      /*this.$axios
+      this.$axios
         .post("api/login", qs.stringify(this.user), {
           headers: {
             'Content-Type':'application/x-www-form-urlencoded',
@@ -57,13 +58,35 @@ export default {
         })
         .then(res => {
           alert("登录成功");
-          this.$router.push('/student')
+          this.jumpToList()
+
       })
       .catch(err => {
         alert(err.response.data.msg);
         console.log(err);
-      });*/
+      });
     },
+    submit(){
+        this.$axios
+        .get("api/UserController/login?username="+this.user.username+"&password="+this.user.password)
+        .then(res => {
+            if(res.data != "student" && res.data != "teacher")
+                alert(res.data);
+            else
+                this.jumpToList(res.data);
+        })
+        .catch(err => {
+            alert("登录失败");
+            console.log(err);
+        });
+    },
+    jumpToList(address) {
+        alert("登陆成功");
+        if(this.user.username == 'stu')
+            this.$router.push('/'+address)
+        else
+            this.$router.push('/'+address)
+    }
   },
   
 }

@@ -142,6 +142,9 @@ export default {
         id(){
             return this.$route.params.id
         },
+        hid(){
+            return this.$route.params.hid
+        }
     },
     methods: {
         logout() {

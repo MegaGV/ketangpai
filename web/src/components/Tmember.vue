@@ -8,7 +8,7 @@
             <el-menu :default-active="activeIndex" class="el-menu-demo"  mode="horizontal" style="position:absolute;margin-left:800px" >
                 <el-menu-item index="1" @click="activeIndex = '1'">成员</el-menu-item>
                 <el-menu-item index="2" @click="activeIndex = '2'">学生分组</el-menu-item>
-                <el-menu-item index="2" @click="activeIndex = '3'">成绩</el-menu-item>
+                <el-menu-item index="3" @click="activeIndex = '3'">成绩</el-menu-item>
             </el-menu>
 
             <ul class="nav-menu-right">
@@ -57,6 +57,7 @@
                                     <span v-else>(助教)</span>
                                 </template>
                             </el-table-column>
+                            <el-table-column prop="school" label="学校" />
                             <el-table-column prop="email" label="邮箱" />
                             <el-table-column prop="phone" label="电话" />
                         </el-table>
@@ -72,6 +73,7 @@
                             <el-table-column type="selection" />
                             <el-table-column><el-avatar icon="el-icon-user-solid"></el-avatar></el-table-column>
                             <el-table-column prop="name" label="姓名" />
+                            <el-table-column prop="school" label="学校" />
                             <el-table-column prop="schoolID" label="学号" />
                             <el-table-column prop="email" label="邮箱" />
                             <el-table-column prop="phone" label="电话" />
@@ -99,12 +101,12 @@ export default {
                 students:["stu","stu2"]
             },
             teachers:[
-                {id:"xcy", name:"徐传运", email:"",phone:""},
-                {id:"xcy2", name:"徐传运2", email:"",phone:""}
+                {id:"xcy", name:"徐传运", school:"重庆理工大学", email:"",phone:""},
+                {id:"xcy2", name:"徐传运2", school:"重庆理工大学", email:"",phone:""}
             ],
             students:[
-                {id:"stu", name:"张三", schoolID:"117030801", email:"",phone:""},
-                {id:"stu2", name:"张三2", schoolID:"117030802", email:"",phone:""},
+                {id:"stu", name:"张三", school:"重庆理工大学", schoolID:"117030801", email:"",phone:""},
+                {id:"stu2", name:"张三2", school:"重庆理工大学", schoolID:"117030802", email:"",phone:""},
             ],
         }
     },

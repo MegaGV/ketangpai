@@ -8,7 +8,7 @@
             <el-menu :default-active="activeIndex" class="el-menu-demo"  mode="horizontal" style="position:absolute;margin-left:800px" >
                 <el-menu-item index="1" @click="activeIndex = '1'">成员</el-menu-item>
                 <el-menu-item index="2" @click="activeIndex = '2'">学生分组</el-menu-item>
-                <el-menu-item index="2" @click="activeIndex = '3'">成绩</el-menu-item>
+                <el-menu-item index="3" @click="activeIndex = '3'">成绩</el-menu-item>
             </el-menu>
 
             <ul class="nav-menu-right">
@@ -50,6 +50,7 @@
                                     <span v-else>(助教)</span>
                                 </template>
                             </el-table-column>
+                            <el-table-column prop="school" label="学校" />
                             <el-table-column prop="email" label="邮箱" />
                             <el-table-column prop="phone" label="电话" />
                         </el-table>
@@ -63,7 +64,8 @@
                         <el-table :data="students">
                             <el-table-column><el-avatar icon="el-icon-user-solid"></el-avatar></el-table-column>
                             <el-table-column prop="name" label="姓名" />
-                            <el-table-column prop="schoolID" label="学号" />
+                            <el-table-column prop="school" label="学校" />
+                            <el-table-column prop="password" label="学号" />
                             <el-table-column prop="email" label="邮箱" />
                             <el-table-column prop="phone" label="电话" />
                         </el-table>
@@ -83,20 +85,10 @@ export default {
             Ttable_visible:true,
             Stable_visible:false,
             quit: true,
-            course:{
-                id:"001", 
-                name:"JavaEE",
-                assistants:["xcy2"],
-                students:["stu","stu2"]
-            },
-            teachers:[
-                {id:"xcy", name:"徐传运", email:"",phone:""},
-                {id:"xcy2", name:"徐传运2", email:"",phone:""}
-            ],
-            students:[
-                {id:"stu", name:"张三", schoolID:"117030801", email:"",phone:""},
-                {id:"stu2", name:"张三2", schoolID:"117030802", email:"",phone:""},
-            ],
+            user:{},
+            course:{},
+            teachers:[],
+            students:[],
         }
     },
     computed: {
@@ -105,6 +97,54 @@ export default {
         },
     },
     methods: {
+        getUserById(id) {
+            this.$axios.get('api/UserController/getUserById?id=' + id)
+            .then(res => {
+                this.user = res.data
+            })
+            .catch(err => {
+                alert("获取用户失败");
+                console.log(err);
+            })
+        },
+        getCourseById() {
+            this.$axios.get('api/CourseController/getCourseById?id=' + this.id)
+            .then(res => {
+                this.course = res.data;
+            })
+            .catch(err => {
+                alert("获取课程失败");
+                console.log(err);
+            })
+        },
+        getTeacherList(){
+            this.$axios.get('api/CourseController/getCourseAssistants?id=' + this.id)
+            .then(res => {
+                this.teachers = res.data;
+                this.$axios.get('api/CourseController/getCourseTeacher?id=' + this.id)
+                .then(res => {
+                    this.teachers.unshift(res.data);
+                })
+                .catch(err => {
+                    alert("获取老师失败");
+                    console.log(err);
+                })
+            })
+            .catch(err => {
+                alert("获取助教失败");
+                console.log(err);
+            })
+        },
+        getStudentList(){
+            this.$axios.get('api/CourseController/getCourseStudents?id=' + this.id)
+            .then(res => {
+                this.students = res.data;
+            })
+            .catch(err => {
+                alert("获取学生失败");
+                console.log(err);
+            })
+        },
         logout() {
             this.$confirm('将退出登录, 是否继续?', '提示', {
                 confirmButtonText: '确定',
@@ -119,6 +159,12 @@ export default {
             this.Stable_visible = !this.Stable_visible;
         }
     },
+    mounted(){
+        this.getUserById(1);
+        this.getCourseById();
+        this.getTeacherList();
+        this.getStudentList();
+    }
 }
 </script>
 

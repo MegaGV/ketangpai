@@ -64,19 +64,20 @@
             <ul class="course_card_homework">
                 <li style="text-align:left">
                     <span>近期作业</span>
-                    </li>
-                <li v-for="homework in course.homeworks" v-bind:key="homework.id" style="text-align:left">
-                    <a>{{homework.name}}</a>
+                </li>
+                <li v-for="homework in course.homeworks" v-bind:key="homework" style="text-align:left">
+                    <a>实验{{homework}}</a>
                 </li>
             </ul>
             <div class="course_card_foot">
                 <el-avatar icon="el-icon-user-solid" :size="20" style="float:left;"></el-avatar>
-                <span style="float:left;">{{course.teacher}}</span> 
+                <span style="float:left;" v-if="course.teacher =='5'">徐传运</span>
+                <span style="float:left;" v-if="course.teacher =='6'">徐传运2</span>
                 <el-dropdown style="float:right">
                     <span style="cursor:pointer;color:blue">更多</span>
                     <el-dropdown-menu slot="dropdown">
-                        <el-dropdown-item @click.native="file_class">归档</el-dropdown-item>
-                        <el-dropdown-item @click.native="exit_class">退课</el-dropdown-item>
+                        <el-dropdown-item @click.native="file_class(course.id)">归档</el-dropdown-item>
+                        <el-dropdown-item @click.native="exit_class(course.id)">退课</el-dropdown-item>
                     </el-dropdown-menu>
                 </el-dropdown>
                 <span style="float:right;font-size:10px;margin-right:10px">置顶</span>
@@ -108,12 +109,16 @@
                     <strong class="jump_to_class2" >
                         <div>{{fieldcourse.name}}&nbsp;{{fieldcourse.introduce}}</div>
                     </strong>
-                    <p class="code2">角色:学生&nbsp;老师:{{fieldcourse.teacher}}</p>
+                    <p class="code2">
+                        角色:学生&nbsp;老师:
+                        <span v-if="fieldcourse.teacher =='5'">徐传运</span>
+                        <span v-if="fieldcourse.teacher =='6'">徐传运2</span>
+                        </p>
                     <el-dropdown style="float:right">
                         <i style="font-size:30px;color:white" class="el-icon-more"></i>
                         <el-dropdown-menu slot="dropdown">
-                            <el-dropdown-item @click.native="unfile_class">恢复</el-dropdown-item>
-                            <el-dropdown-item @click.native="exit_class">退课</el-dropdown-item>
+                            <el-dropdown-item @click.native="unfile_class(fieldcourse.id)">恢复</el-dropdown-item>
+                            <el-dropdown-item @click.native="exit_class(fieldcourse.id)">退课</el-dropdown-item>
                         </el-dropdown-menu>
                     </el-dropdown>
                 </el-card>
@@ -125,7 +130,7 @@
         <span>您可以在“课堂”-“归档管理”中查看此课程</span>
         <span slot="footer" class="dialog-footer">
             <el-button @click="field_visible = false">取消</el-button>
-            <el-button type="primary" @click="field_visible = false">归档</el-button>
+            <el-button type="primary" @click="file_class2">归档</el-button>
         </span>
     </el-dialog>
 </div>
@@ -144,50 +149,135 @@ export default {
             fieldsort_visible:false,
             fieldsort_part:"",
             field_visible:false,
-
-            user:{
-                account: "stu",
-                name: "张三",
-                identity: "student",
-                school: "重庆理工大学",
-                schoolId: "11703080201",
-                email: "",
-                phone: "",
-                courses: ["001","002"],
-                fieldcourses: [],
-            },
-            courses:[
-                    {id: "001", name: "JavaEE", introduce: "117030802", code: "TY94UW", teacher: "徐传运", homeworks:[{id:"001", name:"实验1"}]},
-                    {id: "002", name: "UML", introduce: "1738-2", code: "MHZ96P", teacher: "徐传运2", homeworks:[]},
-            ],
-            fieldcourses: [
-                {id: "001", name:"Alogrim", introduce: "117030801、02", code: "NXWR4W", teacher: "徐传运",homeworks:[]},
-            ],
+            readytofile:"",
+            user:{},
+            courses:[],
+            fieldcourses: [],
         }
     },
     methods: {
+        courseInitial(){
+            this.getAllCourses(this.user.courses.join(','))
+            this.getAllFieldCourses(this.user.fieldcourses.join(','))
+        },
+        getUserById(id) {
+            this.$axios.get('api/UserController/getUserById?id=' + id)
+            .then(res => {
+                this.user = res.data
+                this.user.courses = this.user.courses.split(",");
+                this.user.fieldcourses = this.user.fieldcourses.split(",");
+
+                this.courseInitial();
+            })
+            .catch(err => {
+                alert("获取用户失败");
+                console.log(err);
+            })
+        },
+        getAllCourses(courses){
+            this.$axios.get('api/CourseController/getAllCourses?courses=' + courses)
+            .then(res => {
+                this.courses = res.data;
+            })
+            .catch(err => {
+                alert("获取课程失败");
+                console.log(err);
+            })
+        },
+        getAllFieldCourses(courses){
+            this.$axios.get('api/CourseController/getAllCourses?courses=' + courses)
+            .then(res => {
+                this.fieldcourses = res.data;
+            })
+            .catch(err => {
+                alert("获取课程失败");
+                console.log(err);
+            })
+        },
+        
         join_class(){
             this.$prompt('请输入加课码', '加入课程', {
                 confirmButtonText: '加入',
-                cancelButtonText: '取消'
-            })
+                cancelButtonText: '取消',
+            }).then(({ value }) => {
+                this.$axios.get('api/CourseController/joinCourse?id=' + this.user.id + "&code=" + value)
+                    .then(res => {
+                        alert(res.data);
+                        this.getUserById(1);
+                    })
+                    .catch(err => {
+                        alert("加课失败");
+                        console.log(err);
+                    })
+            }).catch(() => {
+                this.$message({
+                    type: 'info',
+                    message: '取消加课'
+                });
+            });
         },
-        exit_class(){
+        exit_class(cid){
             this.$confirm('你将退选本门课程，确定吗?', '退课', {
                 confirmButtonText: '确定',
                 cancelButtonText: '取消',
                 type: 'warning'
+            }).then(() => {
+                this.$axios.post('api/CourseController/exitCourse?id=' + this.user.id + "&cid=" + cid)
+                    .then(res => {
+                        alert("退课成功");
+                        this.fieldsort_visible = false;
+                        this.getUserById(1);
+                    })
+                    .catch(err => {
+                        alert("退课失败");
+                        console.log(err);
+                    })
+                }).catch(() => {
+                    this.$message({
+                        type: 'info',
+                        message: '取消退课'
+                    });
+            });
+            
+        },
+        file_class(id){
+            this.field_visible = true;
+            this.readytofile = id;
+        },
+        file_class2(){
+            this.$axios.post('api/CourseController/fileCourse?id=' + this.user.id + "&cid="+ this.readytofile)
+            .then(res => {
+                alert("归档成功");
+                this.field_visible = false;
+                this.getUserById(1);
+            })
+            .catch(err => {
+                alert("归档失败");
+                console.log(err);
             })
         },
-        file_class(){
-            this.field_visible = true;
-        },
-        unfile_class(){
+        unfile_class(cid){
             this.$confirm('此课程会在课堂页上显示。', '要恢复此课程么？', {
                 confirmButtonText: '恢复',
                 cancelButtonText: '取消',
                 type: 'warning'
-            })
+            }).then(() => {
+                this.$axios.post('api/CourseController/unfileCourse?id=' + this.user.id + "&cid=" + cid)
+                    .then(res => {
+                        alert("恢复成功");
+                        this.fieldsort_visible = false;
+                        this.getUserById(1);
+                    })
+                    .catch(err => {
+                        alert("恢复失败");
+                        console.log(err);
+                    })
+                }).catch(() => {
+                    this.$message({
+                        type: 'info',
+                        message: '取消恢复'
+                    });
+            });
         },
         logout() {
             this.$confirm('将退出登录, 是否继续?', '提示', {
@@ -199,6 +289,19 @@ export default {
             });
         }
     },
+    mounted(){
+        this.getUserById(1);
+    },
+    computed:{
+       getTeacherName(teacher){
+           if (teacher == '5')
+                return '徐传运'
+            else if (teacher == '6')
+                return '徐传运2'
+            else 
+                return teacher
+       }
+    }
 }
 </script>
 

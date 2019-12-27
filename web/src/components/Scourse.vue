@@ -39,7 +39,7 @@
                 <div class="codetip">
                     <i class="el-icon-user-solid"></i>
                     <router-link :to="{ path: '/student/course/' + course.id + '/member'}" style="text-decoration: none;color:white">
-                            同学{{course.member}}
+                            同学
                     </router-link>
                     </div>
                 <div class="codetip"><i class="el-icon-document"></i>成绩</div>
@@ -122,30 +122,9 @@ export default {
             drawer: false,
             dir: "ltr",
             activeIndex: '2',
-            user:{
-                account: "stu",
-                name: "张三",
-                identity: "student",
-                school: "重庆理工大学",
-                schoolId: "11703080201",
-                email: "",
-                phone: "",
-                courses: ["001","002"],
-                fieldcourses: [],
-            },
-            courses:[
-                {id:"001", name:"JavaEE"}, 
-                {id: "002", name:"UML"}
-            ],
-            course:{
-                id: "001", 
-                name: "JavaEE", 
-                introduce: "117030802", 
-                code: "TY94UW", 
-                teacher: "徐传运", 
-                homeworks:["001"],
-                member:"2",
-            },
+            user:{},
+            courses:[],
+            course:{},
         }
     },
     computed: {
@@ -154,6 +133,37 @@ export default {
         }
     },
     methods:{
+        getUserById(id) {
+            this.$axios.get('api/UserController/getUserById?id=' + id)
+            .then(res => {
+                this.user = res.data
+                this.getAllCourses(this.user.courses);
+            })
+            .catch(err => {
+                alert("获取用户失败");
+                console.log(err);
+            })
+        },
+        getCourseById() {
+            this.$axios.get('api/CourseController/getCourseById?id=' + this.id)
+            .then(res => {
+                this.course = res.data;
+            })
+            .catch(err => {
+                alert("获取课程失败");
+                console.log(err);
+            })
+        },
+        getAllCourses(courses){
+            this.$axios.get('api/CourseController/getAllCourses?courses=' + courses)
+            .then(res => {
+                this.courses = res.data;
+            })
+            .catch(err => {
+                alert("获取课程失败");
+                console.log(err);
+            })
+        },
         logout() {
             this.$confirm('将退出登录, 是否继续?', '提示', {
                 confirmButtonText: '确定',
@@ -165,6 +175,8 @@ export default {
         },
     },
     mounted(){
+        this.getUserById(1);
+        this.getCourseById();
     }
 }
 </script>

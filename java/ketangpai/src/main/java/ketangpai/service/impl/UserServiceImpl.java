@@ -19,7 +19,18 @@ public class UserServiceImpl implements UserService {
 	}
 	
 	@Override
-	public User getUserByAccount(String account) {
-		return dao.getUserByAccount(account);
+	public String login(String username, String password) {
+		User user = dao.getUserByUsername(username);
+		if(user == null)
+			return "用户名不存在";
+		if(user.getPassword().equals(password))
+			return user.getIdentity();
+		else
+			return "密码错误";
+	}
+	
+	@Override
+	public User getUserById(Integer id) {
+		return dao.getUserById(id);
 	}
 }

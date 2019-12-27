@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+			PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+			"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="ketangpai.dao.CourseDao">
+
+	<resultMap type="ketangpai.entity.Course" id="courseMap">
+		<id property="id" column="id" jdbcType="INTEGER" />
+		<result property="name" column="name" jdbcType="VARCHAR"/>
+		<result property="introduce" column="introduce" jdbcType="VARCHAR"/>
+		<result property="code" column="code" jdbcType="VARCHAR"/>
+		<result property="teacher" column="teacher" jdbcType="INTEGER"/>
+		<result property="assistants" column="assistants" jdbcType="VARCHAR"/>
+		<result property="students" column="students" jdbcType="VARCHAR"/>
+		<result property="homeworks" column="homeworks" jdbcType="VARCHAR"/>
+	</resultMap>
+	
+	<select id="getCourseById" resultType="ketangpai.entity.Course">
+		select * from course where id = #{id}
+	</select>
+	
+	<select id="getAllCourses" resultType="ketangpai.entity.Course">
+		select * from course where id in 
+		<foreach item="courseList" collection="array" open="(" separator="," close=")">
+            #{courseList}
+		</foreach>
+	</select>
+	
+	<select id="getCourseIdByCode" resultType="java.lang.Integer">
+		select id from course where code = #{code}
+	</select>
+	
+	<select id="getCourseTeacher" resultType="java.lang.Integer">
+		select teacher from course where id = #{id}
+	</select>
+	
+	<select id="getCourseAssistants" resultType="java.lang.String">
+		select assistants from course where id = #{id}
+	</select>
+	
+	<select id="getCourseStudents" resultType="java.lang.String">
+		select students from course where id = #{id}
+	</select>
+	
+	<update id="updateCourseStudents" >
+		update course set
+		students = #{students}
+		where id = #{id}
+	</update>
+	
+	<insert id="createCourse" parameterType="ketangpai.entity.Course" useGeneratedKeys="true" keyProperty="id">
+		insert into course 
+		<trim prefix="(" suffix=")" suffixOverrides="," >
+			name, introduce, code, teacher
+		</trim>
+		<trim prefix="values (" suffix=")" suffixOverrides="," >
+			#{name, jdbcType=VARCHAR},
+			#{introduce, jdbcType=VARCHAR},
+			#{code, jdbcType=VARCHAR},
+			#{teacher, jdbcType=INTEGER}
+		</trim>
+	</insert>
+	
+</mapper>

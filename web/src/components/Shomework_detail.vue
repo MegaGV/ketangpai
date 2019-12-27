@@ -55,7 +55,7 @@
                 </el-upload>
                 <div class="message" >
                     <span style="line-height:38px;font-size: 14px;color: #010000;float: left;">作业留言:</span>
-                    <el-input type="textarea" v-model="upload.content" 
+                    <el-input :disabled="upload.review == '1'" type="textarea" v-model="upload.content" 
                     placeholder="添加留言，作业要以附件的形式提交，而不是写在留言里..." 
                     style="width:1000px;line-height: 38px;border: 1px solid #D2D2D2;">
                     </el-input>
@@ -83,21 +83,10 @@ export default {
     data(){
         return{
             activeIndex: "1",
-            course:{id:"001", name:"JavaEE"},
-            homework:{
-                id: "001", 
-                name:"实验1", 
-                introduce:"提交demo1", 
-                starttime:"2019-12-16 16:09:33", 
-                endtime:"2019-12-22 16:09:36",
-                course: "001",
-            },
-            upload:{
-                id: "001",
-                content: "",
-                file: "",
-                complete: '0',
-            }
+            user:{},
+            course:{},
+            homework:{},
+            upload:{}
         }
     },
     computed: {
@@ -113,8 +102,51 @@ export default {
         id(){
             return this.$route.params.id
         },
+        hid(){
+            return this.$route.params.hid
+        }
     },
     methods: {
+        getUserById(id) {
+            this.$axios.get('api/UserController/getUserById?id=' + id)
+            .then(res => {
+                this.user = res.data;
+            })
+            .catch(err => {
+                alert("获取用户失败");
+                console.log(err);
+            })
+        },
+        getCourseById() {
+            this.$axios.get('api/CourseController/getCourseById?id=' + this.id)
+            .then(res => {
+                this.course = res.data;
+            })
+            .catch(err => {
+                alert("获取课程失败");
+                console.log(err);
+            })
+        },
+        getHomeworkContentById() {
+            this.$axios.get('api/HomeworkContentController/getHomeworkContentById?id=' + this.hid)
+            .then(res => {
+                this.homework = res.data;
+            })
+            .catch(err => {
+                alert("获取作业信息失败");
+                console.log(err);
+            })
+        },
+        getHomeworkUploadById() {
+            this.$axios.get('api/HomeworkUploadController/getHomeworkUploadById?id=1&hid=' +this.hid)
+            .then(res => {
+                this.upload = res.data;
+            })
+            .catch(err => {
+                alert("获取作业上传情况失败");
+                console.log(err);
+            })
+        },
         logout() {
             this.$confirm('将退出登录, 是否继续?', '提示', {
                 confirmButtonText: '确定',
@@ -125,6 +157,12 @@ export default {
             });
         },
     },
+    mounted(){
+        this.getUserById(1);
+        this.getCourseById();
+        this.getHomeworkContentById();
+        this.getHomeworkUploadById();
+    }
 }
 </script>
 

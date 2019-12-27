@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import ketangpai.service.UserService;
+import ketangpai.exception.UserNotFoundException;
 import ketangpai.entity.User;
 
 @RestController
@@ -23,13 +24,21 @@ public class UserController {
 	@PostMapping("/register")
 	@ResponseBody
 	public void register(@RequestBody User user) {
-		System.out.println("!!!");
 		service.register(user);
 	}
 	
-	@GetMapping("/getUserByAccount")
-	public User getUserByAccount(String account) {
-		return service.getUserByAccount(account);
+	@GetMapping("/login")
+	public String login(String username, String password) {
+		return service.login(username, password);
+	}
+	
+	@GetMapping("/getUserById")
+	public User getUserById(Integer id) {
+		User user = service.getUserById(id);
+		if (user == null) {
+			throw new UserNotFoundException(id);
+		}
+		return user;
 	}
 	
 }

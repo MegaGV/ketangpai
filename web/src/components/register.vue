@@ -17,13 +17,13 @@
             </div>
             <el-form ref="user" :model="user" v-if="user.identity == 'teacher' || user.identity == 'student'" class="login-box">
                 <div class="title">
-                    <el-image :src="Rurl" @click="identityChange('')" class="return" style="float:left"></el-image>
+                    <el-image :src="Rurl" @click="identityChange('')" class="back" style="float:left"></el-image>
                     <h3 v-if="user.identity == 'teacher'" style="float:left">老师/助教注册</h3>
                     <h3 v-if="user.identity == 'student'" style="float:left">学生注册</h3>
                 </div>
                 <div class="padding-cont">
                     <el-form-item>
-                        <el-input type="text" v-model="user.account" placeholder="帐号"></el-input>
+                        <el-input type="text" v-model="user.username" placeholder="帐号"></el-input>
                     </el-form-item>
                     <el-form-item>
                         <el-input type="password" v-model="user.password" placeholder="密码"></el-input>
@@ -41,7 +41,7 @@
                             </el-option>
                         </el-select>
                     </el-form-item>
-                    <el-form-item>
+                    <el-form-item v-if="user.identity == 'student'">
                         <el-input type="text" v-model="user.schoolId" placeholder="学号"></el-input>
                     </el-form-item>
                     <el-form-item>
@@ -78,7 +78,7 @@ export default {
             backgroundSize:'cover'
         },
         user:{
-            account: "",
+            username: "",
             password: "",
             name: "",
             identity: "",
@@ -102,7 +102,7 @@ export default {
   },
   methods: {
       identityChange(identity){
-        this.user.account = "";
+        this.user.username = "";
         this.user.password = "";
         this.user.name = "";
         this.user.identity = identity;
@@ -111,14 +111,14 @@ export default {
         this.user.email= "";
         this.user.phone= "";
         this.user.courses= "";
-        this.user.fieldcourses= "";
-        
+        this.user.fieldcourses= ""; 
       },
       register(){
-            this.$axios
+        this.$axios
             .post("api/UserController/register", this.user)
             .then(res => {
-            alert("注册成功");
+                alert("注册成功");
+                this.identityChange('')
         })
         .catch(err => {
             alert("注册失败");
@@ -192,7 +192,7 @@ export default {
     margin-right: auto;
     border-radius: 4px;
 }
-.return {
+.back {
     width: 40px;
     height: 40px;
     display: inline-block;

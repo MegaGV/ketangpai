@@ -25,9 +25,8 @@
 export default {
     data(){
         return{
-            homeworks:[
-                {id: "001", name:"实验1", introduce:"提交demo1", starttime:"2019-12-16 16:09:33", endtime:"2019-12-22 16:09:36"},
-            ],
+            course:{},
+            homeworks:[],
         }
     },
     computed: {
@@ -36,9 +35,34 @@ export default {
         }
     },
     methods:{
+        getCourseById() {
+            this.$axios.get('api/CourseController/getCourseById?id=' + this.id)
+            .then(res => {
+                this.course = res.data;
+
+                this.getAllHomeworkContent(this.course.homeworks);
+            })
+            .catch(err => {
+                alert("获取课程失败");
+                console.log(err);
+            })
+        },
+        getAllHomeworkContent(homework_content){
+            this.$axios.get('api/HomeworkContentController/getAllHomeworkContent?homework_content=' + homework_content)
+            .then(res => {
+                this.homeworks = res.data;
+            })
+            .catch(err => {
+                alert("获取作业失败");
+                console.log(err);
+            })
+        },
         jump(hid){
             this.$router.push('/student/course/' + this.id + '/homework/detail/' + hid)
         }
+    },
+    mounted(){
+        this.getCourseById(this.id);
     }
 }
 </script>
