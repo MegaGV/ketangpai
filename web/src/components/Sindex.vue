@@ -66,13 +66,12 @@
                     <span>近期作业</span>
                 </li>
                 <li v-for="homework in course.homeworks" v-bind:key="homework" style="text-align:left">
-                    <a>实验{{homework}}</a>
+                    <a>{{homework}}</a>
                 </li>
             </ul>
             <div class="course_card_foot">
                 <el-avatar icon="el-icon-user-solid" :size="20" style="float:left;"></el-avatar>
-                <span style="float:left;" v-if="course.teacher =='5'">徐传运</span>
-                <span style="float:left;" v-if="course.teacher =='6'">徐传运2</span>
+                <span style="float:left;" >{{course.teacher}}</span>
                 <el-dropdown style="float:right">
                     <span style="cursor:pointer;color:blue">更多</span>
                     <el-dropdown-menu slot="dropdown">
@@ -111,8 +110,7 @@
                     </strong>
                     <p class="code2">
                         角色:学生&nbsp;老师:
-                        <span v-if="fieldcourse.teacher =='5'">徐传运</span>
-                        <span v-if="fieldcourse.teacher =='6'">徐传运2</span>
+                        <span>{{fieldcourse.teacher}}</span>
                         </p>
                     <el-dropdown style="float:right">
                         <i style="font-size:30px;color:white" class="el-icon-more"></i>
@@ -178,6 +176,12 @@ export default {
             this.$axios.get('api/CourseController/getAllCourses?courses=' + courses)
             .then(res => {
                 this.courses = res.data;
+
+                for(let i = 0; i < this.courses.length; i++){
+                    this.courses[i].homeworks = this.courses[i].homeworks.split(',')
+                }
+                this.getHomeworkName();
+                this.getCoursesTeachersName();
             })
             .catch(err => {
                 alert("获取课程失败");
@@ -188,6 +192,8 @@ export default {
             this.$axios.get('api/CourseController/getAllCourses?courses=' + courses)
             .then(res => {
                 this.fieldcourses = res.data;
+
+                this.getFieldCoursesTeachersName();
             })
             .catch(err => {
                 alert("获取课程失败");
@@ -279,6 +285,46 @@ export default {
                     });
             });
         },
+        getHomeworkName(){
+            for(let i = 0; i < this.courses.length; i++){
+                for(let j = 0; j < this.courses[i].homeworks.length; j++){
+                    this.$axios.get('api/HomeworkContentController/getHomeworkContentName?id=' + this.courses[i].homeworks[j])
+                    .then(res => {
+                        this.courses[i].homeworks[j] = res.data;
+                    })
+                    .catch(err => {
+                        alert("获取作业名失败");
+                        console.log(err);
+                    })
+                }
+            }
+        },
+        getCoursesTeachersName(){
+            for(let i = 0; i < this.courses.length; i++){
+                this.$axios.get('api/UserController/getUserName?id=' + this.courses[i].teacher)
+                .then(res => {
+                    this.courses[i].teacher = res.data;
+                })
+                .catch(err => {
+                    alert("获取老师姓名失败");
+                    console.log(err);
+                })
+            }
+        },
+        getFieldCoursesTeachersName(){
+            for(let i = 0; i < this.fieldcourses.length; i++){
+                this.$axios.get('api/UserController/getUserName?id=' + this.fieldcourses[i].teacher)
+                .then(res => {
+                    this.fieldcourses[i].teacher = res.data;
+                })
+                .catch(err => {
+                    alert("获取老师姓名失败");
+                    console.log(err);
+                })
+            }
+        },
+        
+
         logout() {
             this.$confirm('将退出登录, 是否继续?', '提示', {
                 confirmButtonText: '确定',
@@ -293,14 +339,6 @@ export default {
         this.getUserById(1);
     },
     computed:{
-       getTeacherName(teacher){
-           if (teacher == '5')
-                return '徐传运'
-            else if (teacher == '6')
-                return '徐传运2'
-            else 
-                return teacher
-       }
     }
 }
 </script>

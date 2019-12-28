@@ -46,6 +46,23 @@ public class CourseServiceImpl implements CourseService {
 		
 	}
 	
+	@Override
+	public void editCourse(Course course) {
+		dao.editCourse(course);
+	}
+	
+	@Override
+	public void deleteCourse(Integer id, Integer cid) {
+		deleteCourseFromUser(id, cid);
+		
+		String students = dao.getCourseStudents(cid);
+		if(!students.isEmpty()) {
+			String[] studentList = students.split(",");
+			for(int i = 0; i < studentList.length; i++)
+				deleteCourseFromUser(Integer.parseInt(studentList[i]),cid);
+		}
+		dao.deleteCourse(cid);
+	}
 	
 	@Override
 	public String joinCourse(Integer id, String code) {
@@ -108,40 +125,7 @@ public class CourseServiceImpl implements CourseService {
 		}
 		dao.updateCourseStudents(cid, students);
 		
-		String courses = userdao.getUserCourses(id);
-		String fieldcourses = userdao.getUserFieldCourses(id);
-		Boolean isIn = false;
-		if(!courses.isEmpty())
-		{
-			
-			String[] courseList= courses.split(",");
-			courses = "";
-			
-			for(int i = 0; i <courseList.length; i++) {
-				if( Integer.parseInt(courseList[i]) == cid) 
-					isIn = true;
-				else {
-					if(!courses.isEmpty())
-						courses += ",";
-					courses += courseList[i];
-				}
-			}
-		}
-		if(isIn) {
-			userdao.updateCourses(id, courses);
-		}
-		else {
-			String[] courseList= fieldcourses.split(",");
-			fieldcourses = "";
-			for(int i = 0; i <courseList.length; i++) {
-				if( Integer.parseInt(courseList[i]) != cid) {
-					if(!fieldcourses.isEmpty())
-						fieldcourses += ",";
-					fieldcourses += courseList[i];
-				}
-			}
-			userdao.updateFieldCourses(id, fieldcourses);
-		}
+		deleteCourseFromUser(id, cid);
 	}
 	
 	@Override
@@ -217,5 +201,42 @@ public class CourseServiceImpl implements CourseService {
 		for(int i = 0; i < useridList.length; i++)
 			students.add(userdao.getUserById(Integer.parseInt(useridList[i])));
 		return students;
+	}
+	
+	private void deleteCourseFromUser(Integer id, Integer cid) {
+		String courses = userdao.getUserCourses(id);
+		String fieldcourses = userdao.getUserFieldCourses(id);
+		Boolean isIn = false;
+		if(!courses.isEmpty())
+		{
+			
+			String[] courseList= courses.split(",");
+			courses = "";
+			
+			for(int i = 0; i <courseList.length; i++) {
+				if( Integer.parseInt(courseList[i]) == cid) 
+					isIn = true;
+				else {
+					if(!courses.isEmpty())
+						courses += ",";
+					courses += courseList[i];
+				}
+			}
+		}
+		if(isIn) {
+			userdao.updateCourses(id, courses);
+		}
+		else {
+			String[] courseList= fieldcourses.split(",");
+			fieldcourses = "";
+			for(int i = 0; i <courseList.length; i++) {
+				if( Integer.parseInt(courseList[i]) != cid) {
+					if(!fieldcourses.isEmpty())
+						fieldcourses += ",";
+					fieldcourses += courseList[i];
+				}
+			}
+			userdao.updateFieldCourses(id, fieldcourses);
+		}
 	}
 }

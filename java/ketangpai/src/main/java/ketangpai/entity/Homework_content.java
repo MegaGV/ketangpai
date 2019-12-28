@@ -12,6 +12,18 @@ public class Homework_content {
 	private Integer reviewed;
 	private Integer uploaded;
 	
+	public Homework_content() {
+		super();
+	}
+	
+	public Homework_content(String name, String introduce, Date endtime, Integer course) {
+		super();
+		this.name = name;
+		this.introduce = introduce;
+		this.endtime = endtime;
+		this.course = course;
+	}
+	
 	public Homework_content(Integer id, String name, String introduce, Date starttime, Date endtime, Integer course,
 			Integer reviewed, Integer uploaded) {
 		super();

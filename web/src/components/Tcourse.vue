@@ -4,7 +4,7 @@
             <div class="nav-menu-left">
                 <p style="font-size: 18px;float:left;margin:25px 50px" class="el-icon-s-unfold" @click="drawer = true"></p>
                 <el-breadcrumb separator-class="el-icon-arrow-right" style="float:left;font-size: 14px;line-height: 65px;width:700px;font-weight: 400;">
-                    <el-breadcrumb-item :to="{ path: '/student' }">课堂</el-breadcrumb-item>
+                    <el-breadcrumb-item :to="{ path: '/teacher' }">课堂</el-breadcrumb-item>
                     <el-breadcrumb-item>{{course.name}}&nbsp;{{course.introduce}}</el-breadcrumb-item>
                 </el-breadcrumb>
             </div>
@@ -135,28 +135,9 @@ export default {
             drawer: false,
             dir: "ltr",
             activeIndex: '2',
-            user:{
-                username: "xcy",
-                name: "徐传运",
-                identity: "teacher",
-                school: "重庆理工大学",
-                email: "",
-                phone: "",
-                courses: ["001"],
-                fieldcourses: ["003"],
-            },
-            courses:[
-                {id:"001", name:"JavaEE"}, 
-            ],
-            course:{
-                id: "001", 
-                name: "JavaEE", 
-                introduce: "117030802", 
-                code: "TY94UW", 
-                teacher: "徐传运", 
-                homeworks:["001"],
-                member:"2",
-            },
+            user:{},
+            courses:[],
+            course:{},
         }
     },
     computed: {
@@ -165,12 +146,45 @@ export default {
         }
     },
     methods: {
+        getUserById(id) {
+            this.$axios.get('api/UserController/getUserById?id=' + id)
+            .then(res => {
+                this.user = res.data
+                this.getAllCourses(this.user.courses);
+            })
+            .catch(err => {
+                alert("获取用户失败");
+                console.log(err);
+            })
+        },
+        getCourseById() {
+            this.$axios.get('api/CourseController/getCourseById?id=' + this.id)
+            .then(res => {
+                this.course = res.data;
+
+                this.course.homeworks = this.course.homeworks.split(',')
+            })
+            .catch(err => {
+                alert("获取课程失败");
+                console.log(err);
+            })
+        },
+        getAllCourses(courses){
+            this.$axios.get('api/CourseController/getAllCourses?courses=' + courses)
+            .then(res => {
+                this.courses = res.data;
+            })
+            .catch(err => {
+                alert("获取课程失败");
+                console.log(err);
+            })
+        },
         edit_course_name(){
             this.$prompt('请输入课程名', '修改课程名', {
             confirmButtonText: '确定',
             cancelButtonText: '取消',
             }).then(({ value }) => {
-            this.course.name = value;
+                this.course.name = value;
             });
         },
         logout() {
@@ -184,6 +198,8 @@ export default {
         },
     },
     mounted(){
+        this.getUserById(5);
+        this.getCourseById();
     }
 }
 </script>

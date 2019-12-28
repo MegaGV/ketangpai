@@ -6,4 +6,5 @@ public interface UserService {
 	public void register(User user);
 	public String login(String username, String password);
 	public User getUserById(Integer id);
+	public String getUserName(Integer id);
 }

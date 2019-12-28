@@ -10,11 +10,21 @@ public class Homework_upload {
 	private Integer homework;
 	private Integer score;
 	private Integer complete;
-	private Integer riview;
-	private Date upload_data;
+	private Integer review;
+	private Date upload_date;
+	
+	public Homework_upload() {
+		super();
+	}
+	
+	public Homework_upload(Integer student, Integer homework) {
+		super();
+		this.student = student;
+		this.homework = homework;
+	}
 	
 	public Homework_upload(Integer id, String content, String file, Integer student, Integer homework, Integer score,
-			Integer complete, Integer riview, Date upload_data) {
+			Integer complete, Integer review, Date upload_date) {
 		super();
 		this.id = id;
 		this.content = content;
@@ -23,21 +33,8 @@ public class Homework_upload {
 		this.homework = homework;
 		this.score = score;
 		this.complete = complete;
-		this.riview = riview;
-		this.upload_data = upload_data;
-	}
-
-	public Homework_upload(Integer id, String content, String file, Integer student, Integer homework, Integer score,
-			Integer complete, Integer riview) {
-		super();
-		this.id = id;
-		this.content = content;
-		this.file = file;
-		this.student = student;
-		this.homework = homework;
-		this.score = score;
-		this.complete = complete;
-		this.riview = riview;
+		this.review = review;
+		this.upload_date = upload_date;
 	}
 
 	public Integer getId() {
@@ -96,20 +93,20 @@ public class Homework_upload {
 		this.complete = complete;
 	}
 
-	public Integer getRiview() {
-		return riview;
+	public Integer getReview() {
+		return review;
 	}
 
-	public void setRiview(Integer riview) {
-		this.riview = riview;
+	public void setReview(Integer review) {
+		this.review = review;
 	}
 
-	public Date getUpload_data() {
-		return upload_data;
+	public Date getUpload_date() {
+		return upload_date;
 	}
 
-	public void setUpload_data(Date upload_data) {
-		this.upload_data = upload_data;
+	public void setUpload_date(Date upload_date) {
+		this.upload_date = upload_date;
 	}
 	
 	

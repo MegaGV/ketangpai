@@ -2,14 +2,8 @@
     <div>
         <div style="height: 60px;box-shadow: 0px 1px 3px 0px rgba(0, 0, 0, 0.04);">
             <div class="return">
-                ←<router-link class="course_button" :to="{ path: '/teacher/course/' + id + '/homework'}">{{course.name}} </router-link>
+                ←<router-link class="course_button" :to="{ path: '/teacher/course/' + id + '/homework/detail/' + hid}">{{course.name}} </router-link>
             </div>
-            
-            <el-menu :default-active="activeIndex" class="el-menu-demo"  mode="horizontal" style="position:absolute;margin-left:800px" >
-                <el-menu-item index="1" @click="activeIndex = '1'">成员</el-menu-item>
-                <el-menu-item index="2" @click="activeIndex = '2'">学生分组</el-menu-item>
-                <el-menu-item index="2" @click="activeIndex = '3'">成绩</el-menu-item>
-            </el-menu>
 
             <ul class="nav-menu-right">
                 <li class="nav-menu-right-item">
@@ -31,7 +25,37 @@
 
         </div>
 
-        
+        <div class="homework_upload">
+            <div class="homework_upload_top">
+                <h3 style="text-align:left">{{homework.name}}</h3>
+                <p class="homework_upload_info">截至日期：{{homework.endtime}}</p>
+                <p class="homework_upload_info">个人作业</p>
+                <p class="homework_upload_info">需要查重</p>
+            </div>
+
+            <div class="homework_upload_top2">
+                <el-button type="primary" style="position:relative;right:720px" @click="scoring">打分</el-button>
+                <p style="float:right;margin:0" v-if="isreview">分数：{{upload.score}}/100</p>
+                <p style="float:right;margin:0" v-else>未批阅</p>
+            </div>
+
+            <el-form class="homework_upload_box">
+                <el-upload :disabled="true" class="upload-demo" :file-list="this.upload.file">
+                    <div class="uploadbox">
+                        <i class="el-icon-circle-plus" style="font-size:35px;color:rgba(50,186,240,1);position:relative;right:140px;top:20px"></i>
+                        <div class="el-upload__text" style="position:relative;right:45px;bottom:20px">学生上传的作业文件</div>
+                        <div class="el-upload__tip" style="position:relative;right:10px;bottom:20px">支持各类文档、图片、代码、压缩包格式</div>
+                    </div>  
+                </el-upload>
+                <div class="message" >
+                    <span style="line-height:38px;font-size: 14px;color: #010000;float: left;">学生留言:</span>
+                    <el-input :disabled="true" type="textarea" v-model="upload.content" 
+                    style="width:1000px;line-height: 38px;border: 1px solid #D2D2D2;">
+                    </el-input>
+                </div>
+            </el-form>
+
+        </div>
             
         
     </div>
@@ -41,41 +65,83 @@
 export default {
     data(){
         return{
-            activeIndex: "1",
-            course:{
-                id:"001", 
-                name:"JavaEE",
-                students:["001","002"]
-            },
-            homework:{
-                id: "001", 
-                name:"实验1", 
-                introduce:"提交demo1", 
-                starttime:"2019-12-16 16:09:33", 
-                endtime:"2019-12-22 16:09:36",
-                course: "001",
-            },
-            homeworks:[
-                {id:"001",content:"",file:"",student:"stu",student_name:"张三",score:"0",complete:"1",review:"0", upload_data:"2019-12-24 11:24:59"},
-                {id:"002",content:"",file:"",student:"stu2",student_name:"张三2",score:"0",complete:"0",review:"0",upload_data:""},
-            ],
+            user:{},
+            course:{},
+            homework:{},
+            upload:{}
         }
     },
     computed: {
-        show_detail () {
-            return this.activeIndex == '1'
-        },
-        show_info() {
-            return this.activeIndex == '2'
-        },
-        iscomplete() {
-            return this.upload.complete == '1'
-        },
         id(){
             return this.$route.params.id
         },
+        hid(){
+            return this.$route.params.hid
+        },
+        uid(){
+            return this.$route.params.uid
+        },
+        isreview() {
+            return this.upload.review == '1'
+        }
     },
     methods: {
+        getUserById(id) {
+            this.$axios.get('api/UserController/getUserById?id=' + id)
+            .then(res => {
+                this.user = res.data;
+            })
+            .catch(err => {
+                alert("获取用户失败");
+                console.log(err);
+            })
+        },
+        getCourseById() {
+            this.$axios.get('api/CourseController/getCourseById?id=' + this.id)
+            .then(res => {
+                this.course = res.data;
+            })
+            .catch(err => {
+                alert("获取课程失败");
+                console.log(err);
+            })
+        },
+        getHomeworkContentById() {
+            this.$axios.get('api/HomeworkContentController/getHomeworkContentById?id=' + this.hid)
+            .then(res => {
+                this.homework = res.data;
+            })
+            .catch(err => {
+                alert("获取作业信息失败");
+                console.log(err);
+            })
+        },
+        getHomeworkUploadById() {
+            this.$axios.get('api/HomeworkUploadController/getHomeworkUpload?id=' + this.uid)
+            .then(res => {
+                this.upload = res.data;
+            })
+            .catch(err => {
+                alert("获取作业上传情况失败");
+                console.log(err);
+            })
+        },
+        scoring() {
+            this.$prompt('请输入分数', '打分', {
+            confirmButtonText: '确定',
+            cancelButtonText: '取消',
+            }).then(({ value }) => {
+                this.$axios.post('api/HomeworkUploadController/Scoring?id=' + this.uid + "&score=" + value)
+                .then(res => {
+                    alert("分数更新");
+                    this.getHomeworkUploadById();
+                })
+                .catch(err => {
+                    alert("打分失败");
+                    console.log(err);
+                })
+            });
+        },
         logout() {
             this.$confirm('将退出登录, 是否继续?', '提示', {
                 confirmButtonText: '确定',
@@ -86,6 +152,12 @@ export default {
             });
         },
     },
+    mounted(){
+        this.getUserById(5);
+        this.getCourseById();
+        this.getHomeworkContentById();
+        this.getHomeworkUploadById();
+    }
 }
 </script>
 
@@ -132,6 +204,54 @@ ul {
 li {
     display: list-item;
     list-style: none;
+}
+.homework_upload {
+    padding-top: 40px;
+    padding-bottom: 60px;
+}
+.homework_upload_info{
+    font-size: 12px;
+    padding: 0 5px;
+    line-height: 20px;
+    margin-right: 10px;
+    margin-bottom: 40px;
+    background-color: #F1F3F4;
+    color: #5F6368;
+    border-radius: 2px;
+    float: left;
+}
+.homework_upload_top{
+    width: 1224px;
+    height:100px;
+    margin: 0 auto;
+}
+.homework_upload_top2{
+    width: 1224px;
+    height: 40px;
+    line-height: 40px;
+    margin: 0 auto;
+}
+.homework_upload_box {
+    width: 1224px;
+    margin: 0 auto;
+    margin-top: 20px;
+    border: 1px solid #E2E6ED;
+    background: #FFF;
+    border-radius: 8px;
+}
+.message {
+    background: #F1F3F4;
+    border-top: 1px solid #dcdcdc;
+    padding: 26px 0 26px 25px;
+}
+.uploadbox {
+    width: 330px;
+    height: 80px;
+    border: 2px dashed #CCC;
+    margin: 20px 0 24px 24px;
+    display: block;
+    position: relative;
+    right: 440px;
 }
 
 

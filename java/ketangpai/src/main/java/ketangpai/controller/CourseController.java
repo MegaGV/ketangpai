@@ -75,4 +75,15 @@ public class CourseController {
 	public void createCourse(@RequestBody Course course) {
 		service.createCourse(course);
 	}
+	
+	@PostMapping("/editCourse")
+	@ResponseBody
+	public void editCourse(@RequestBody Course course) {
+		service.editCourse(course);
+	}
+	
+	@PostMapping("/deleteCourse")
+	public void deleteCourse(Integer id, Integer cid) {
+		service.deleteCourse(id, cid);
+	}
 }

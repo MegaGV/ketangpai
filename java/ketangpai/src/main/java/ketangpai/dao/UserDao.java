@@ -9,6 +9,7 @@ import ketangpai.entity.User;
 public interface UserDao {
 	public User getUserById(Integer id);
 	public User getUserByUsername(String username);
+	public String getUserName(Integer id);
 	public void register(User user);
 	
 	public String getUserCourses(Integer id);

@@ -17,4 +17,9 @@ public interface CourseDao {
 	public String getCourseStudents(Integer id);
 	public void updateCourseStudents(@Param("id")Integer id, @Param("students")String students);
 	public void createCourse(Course course);
+	public void editCourse(Course course);
+	public void deleteCourse(Integer id);
+	
+	public String getCourseHomeworks(Integer id);
+	public void updateCourseHomeworks(@Param("id")Integer id, @Param("homeworks")String homeworks);
 }

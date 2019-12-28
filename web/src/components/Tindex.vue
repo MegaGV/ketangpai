@@ -73,12 +73,12 @@
                     <span>近期作业</span>
                 </li>
                 <li v-for="homework in course.homeworks" v-bind:key="homework" style="text-align:left">
-                    <a>实验{{homework}}</a>
+                    <a>{{homework}}</a>
                 </li>
             </ul>
             <div class="course_card_foot">
                 <el-avatar icon="el-icon-user-solid" :size="20" style="float:left;"></el-avatar>
-                <span style="float:left;">成员</span> 
+                <span style="float:left;">成员{{course.students.length}}人</span> 
                 <el-dropdown style="float:right">
                     <span style="cursor:pointer;color:blue">更多</span>
                     <el-dropdown-menu slot="dropdown">
@@ -122,8 +122,8 @@
                     <el-dropdown style="float:right">
                         <i style="font-size:30px;color:white" class="el-icon-more"></i>
                         <el-dropdown-menu slot="dropdown">
-                            <el-dropdown-item @click.native="unfile_class">恢复</el-dropdown-item>
-                            <el-dropdown-item @click.native="delete_class">删除</el-dropdown-item>
+                            <el-dropdown-item @click.native="unfile_class(fieldcourse.id)">恢复</el-dropdown-item>
+                            <el-dropdown-item @click.native="delete_class(fieldcourse.id)">删除</el-dropdown-item>
                         </el-dropdown-menu>
                     </el-dropdown>
                 </el-card>
@@ -158,7 +158,8 @@
 
         <span slot="footer" class="dialog-footer">
             <el-button @click="close_courseinfo">取消</el-button>
-            <el-button type="primary" @click="create_class">提交</el-button>
+            <el-button :disabled="course_info.id !=''" type="primary" @click="create_class">新建</el-button>
+            <el-button :disabled="course_info.id ==''" type="primary" @click="edit_class">保存</el-button>
         </span>
     </el-dialog>
 </div>
@@ -179,7 +180,6 @@ export default {
             fieldsort_part:"",
 
             field_visible:false,
-
             course_visible:false,
 
             readytofile:"",
@@ -222,6 +222,12 @@ export default {
             this.$axios.get('api/CourseController/getAllCourses?courses=' + courses)
             .then(res => {
                 this.courses = res.data;
+
+                for(let i = 0; i < this.courses.length; i++){
+                    this.courses[i].students = this.courses[i].students.split(',')
+                    this.courses[i].homeworks = this.courses[i].homeworks.split(',')
+                }
+                this.getHomeworkName();
             })
             .catch(err => {
                 alert("获取课程失败");
@@ -304,16 +310,59 @@ export default {
                     this.close_courseinfo();
             })
             .catch(err => {
-                alert("注册失败");
+                alert("新建失败");
                 console.log(err);
             });
         },
-        delete_class(){
-            this.$confirm('你将删除本门课程，确定吗?', '删除', {
+        edit_class(){
+            this.$axios
+                .post("api/CourseController/editCourse", this.course_info)
+                .then(res => {
+                    alert("修改成功");
+                    this.getUserById(5);
+                    this.close_courseinfo();
+            })
+            .catch(err => {
+                alert("修改失败");
+                console.log(err);
+            });
+        },
+        delete_class(cid){
+            this.$confirm('你将删除本门课程，确定吗。', '要删除此课程么？', {
                 confirmButtonText: '确定',
                 cancelButtonText: '取消',
                 type: 'warning'
-            })
+            }).then(() => {
+                this.$axios.post('api/CourseController/deleteCourse?id=' + this.user.id + "&cid="+cid)
+                    .then(res => {
+                        alert("删除成功");
+                        this.getUserById(5);
+                    })
+                    .catch(err => {
+                        alert("删除失败");
+                        console.log(err);
+                    })
+                }).catch(() => {
+                    this.$message({
+                        type: 'info',
+                        message: '取消删除'
+                    });
+            });
+        },
+        getHomeworkName(){
+            for(let i = 0; i < this.courses.length; i++){
+                for(let j = 0; j < this.courses[i].homeworks.length; j++){
+                    this.$axios.get('api/HomeworkContentController/getHomeworkContentName?id=' + this.courses[i].homeworks[j])
+                    .then(res => {
+                        this.courses[i].homeworks[j] = res.data;
+                    })
+                    .catch(err => {
+                        alert("获取作业名失败");
+                        console.log(err);
+                    })
+                }
+            }
+
         },
         logout() {
             this.$confirm('将退出登录, 是否继续?', '提示', {

@@ -81,7 +81,7 @@ export default {
         });
     },
     jumpToList(address) {
-        alert("登陆成功");
+        alert("登录成功");
         if(this.user.username == 'stu')
             this.$router.push('/'+address)
         else

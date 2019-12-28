@@ -54,9 +54,9 @@
             </div>
             <el-divider></el-divider>
             
-            <el-table :data="homeworks" stripe style="width: 1224px;margin:0 auto" >
+            <el-table :data="uploads" stripe style="width: 1224px;margin:0 auto" >
                 <el-table-column type="selection" ></el-table-column>
-                <el-table-column prop="student_name" label="姓名"/>
+                <el-table-column prop="student" label="姓名"/>
                 <el-table-column label="成绩" >
                     <template slot-scope="scope">
                         <div v-if="scope.row.complete == 0"><span style="color:red">未交</span></div>
@@ -69,7 +69,7 @@
                 <el-table-column label="提交状态" >
                     <template slot-scope="scope">
                         <div v-if="scope.row.complete == 0">---</div>
-                        <div v-else>{{scope.row.upload_data}}</div>
+                        <div v-else>{{scope.row.upload_date}}提交</div>
                     </template>
                 </el-table-column>
                 <el-table-column label="操作">
@@ -83,6 +83,9 @@
                                 :to="{ path: '/teacher/course/' + course.id + '/homework/detail/' + homework.id + '/review/' + scope.row.id}" >
                                     进入批阅
                                 </router-link>
+                            </el-button>
+                            <el-button type="primary" @click="scoring(scope.row.id)">
+                                打分
                             </el-button>
                             
                         </div>
@@ -110,23 +113,10 @@ export default {
     data(){
         return{
             activeIndex: "1",
-            course:{
-                id:"001", 
-                name:"JavaEE",
-                students:["001","002"]
-            },
-            homework:{
-                id: "001", 
-                name:"实验1", 
-                introduce:"提交demo1", 
-                starttime:"2019-12-16 16:09:33", 
-                endtime:"2019-12-22 16:09:36",
-                course: "001",
-            },
-            homeworks:[
-                {id:"001",content:"",file:"",student:"stu",student_name:"张三",score:"0",complete:"1",review:"0", upload_data:"2019-12-24 11:24:59"},
-                {id:"002",content:"",file:"",student:"stu2",student_name:"张三2",score:"0",complete:"0",review:"0",upload_data:""},
-            ],
+            user:{},
+            course:{},
+            homework:{},
+            uploads:[],
         }
     },
     computed: {
@@ -147,6 +137,75 @@ export default {
         }
     },
     methods: {
+        getUserById(id) {
+            this.$axios.get('api/UserController/getUserById?id=' + id)
+            .then(res => {
+                this.user = res.data;
+            })
+            .catch(err => {
+                alert("获取用户失败");
+                console.log(err);
+            })
+        },
+        getCourseById() {
+            this.$axios.get('api/CourseController/getCourseById?id=' + this.id)
+            .then(res => {
+                this.course = res.data;
+            })
+            .catch(err => {
+                alert("获取课程失败");
+                console.log(err);
+            })
+        },
+        getHomeworkContentById() {
+            this.$axios.get('api/HomeworkContentController/getHomeworkContentById?id=' + this.hid)
+            .then(res => {
+                this.homework = res.data;
+            })
+            .catch(err => {
+                alert("获取作业信息失败");
+                console.log(err);
+            })
+        },
+        getHomeworkAllUpload(){
+            this.$axios.get('api/HomeworkUploadController/getHomeworkAllUpload?id=' + this.hid)
+            .then(res => {
+                this.uploads = res.data;
+
+                this.getUserName();
+            })
+            .catch(err => {
+                alert("获取学生作业失败");
+                console.log(err);
+            })
+        },
+        getUserName(){
+            for(let i = 0; i < this.uploads.length; i++){
+                this.$axios.get('api/UserController/getUserName?id=' + this.uploads[i].student)
+                .then(res => {
+                    this.uploads[i].student = res.data;
+                })
+                .catch(err => {
+                    alert("获取学生姓名失败");
+                    console.log(err);
+                })
+            }
+        },
+        scoring(uid) {
+            this.$prompt('请输入分数', '打分', {
+            confirmButtonText: '确定',
+            cancelButtonText: '取消',
+            }).then(({ value }) => {
+                this.$axios.post('api/HomeworkUploadController/Scoring?id=' + uid + "&score=" + value)
+                .then(res => {
+                    this.getHomeworkAllUpload();
+                })
+                .catch(err => {
+                    alert("打分失败");
+                    console.log(err);
+                })
+            });
+        },
         logout() {
             this.$confirm('将退出登录, 是否继续?', '提示', {
                 confirmButtonText: '确定',
@@ -157,6 +216,12 @@ export default {
             });
         },
     },
+    mounted(){
+        this.getUserById(5);
+        this.getCourseById();
+        this.getHomeworkContentById();
+        this.getHomeworkAllUpload();
+    }
 }
 </script>
 

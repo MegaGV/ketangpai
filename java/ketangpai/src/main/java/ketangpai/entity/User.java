@@ -17,7 +17,7 @@ public class User{
 		super();
 	}
 	
-	public User(Integer id,String username, String password, String name, String identity, String school, String schoolId,
+	public User(Integer id,String username, String password, String name, String identity, String school, String schoolID,
 			String email, String phone, String courses, String fieldcourses) {
 		super();
 		this.setId(id);
@@ -26,14 +26,14 @@ public class User{
 		this.name = name;
 		this.identity = identity;
 		this.school = school;
-		this.schoolID = schoolId;
+		this.schoolID = schoolID;
 		this.email = email;
 		this.phone = phone;
 		this.courses = courses;
 		this.fieldcourses = fieldcourses;
 	}
 	
-	public User(Integer id,String username, String password, String name, String identity, String school, String schoolId,
+	public User(Integer id,String username, String password, String name, String identity, String school, String schoolID,
 			String email, String phone) {
 		super();
 		this.setId(id);
@@ -42,7 +42,7 @@ public class User{
 		this.name = name;
 		this.identity = identity;
 		this.school = school;
-		this.schoolID = schoolId;
+		this.schoolID = schoolID;
 		this.email = email;
 		this.phone = phone;
 	}
@@ -87,12 +87,12 @@ public class User{
 		this.school = school;
 	}
 
-	public String getSchoolId() {
+	public String getschoolID() {
 		return schoolID;
 	}
 
-	public void setSchoolId(String schoolId) {
-		this.schoolID = schoolId;
+	public void setschoolID(String schoolID) {
+		this.schoolID = schoolID;
 	}
 
 	public String getEmail() {

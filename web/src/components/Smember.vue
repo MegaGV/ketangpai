@@ -65,7 +65,7 @@
                             <el-table-column><el-avatar icon="el-icon-user-solid"></el-avatar></el-table-column>
                             <el-table-column prop="name" label="姓名" />
                             <el-table-column prop="school" label="学校" />
-                            <el-table-column prop="password" label="学号" />
+                            <el-table-column prop="schoolID" label="学号" />
                             <el-table-column prop="email" label="邮箱" />
                             <el-table-column prop="phone" label="电话" />
                         </el-table>

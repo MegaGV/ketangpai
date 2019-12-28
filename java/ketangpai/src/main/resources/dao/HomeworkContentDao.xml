@@ -19,11 +19,39 @@
 		select * from homework_content where id = #{id}
 	</select>
 	
+	<select id="getHomeworkContentName" resultType="java.lang.String">
+		select name from homework_content where id = #{id}
+	</select>
+	
+	<select id="getHomeworkContentIdByName" resultType="java.lang.Integer">
+		select id from homework_content where name = #{name}
+	</select>
+	
 	<select id="getAllHomeworkContent" resultType="ketangpai.entity.Homework_content">
 		select * from homework_content where id in 
 		<foreach item="homeworkContentList" collection="array" open="(" separator="," close=")">
             #{homeworkContentList}
 		</foreach>
 	</select>
+	
+	<insert id="createHomework" parameterType="ketangpai.entity.Homework_content" useGeneratedKeys="true" keyProperty="id">
+		insert into homework_content
+		<trim prefix="(" suffix=")" suffixOverrides="," >
+			name, introduce, starttime, endtime, course
+		</trim>
+		<trim prefix="values (" suffix=")" suffixOverrides="," >
+			#{name, jdbcType=VARCHAR},
+			#{introduce, jdbcType=VARCHAR},
+			#{starttime, jdbcType=DATE},
+			#{endtime, jdbcType=DATE},
+			#{course, jdbcType=INTEGER}
+		</trim>
+	</insert>
+	
+	<update id="updateReviewed">
+		update homework_content set
+		reviewed = #{reviewed}
+		where id = #{id}
+	</update>
 	
 </mapper>

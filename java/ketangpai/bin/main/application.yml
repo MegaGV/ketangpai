@@ -13,5 +13,9 @@ spring:
 mybatis:
   type-aliases-package: ketangpai.entity
   mapper-locations: classpath:dao/*Dao.xml
-
+app:
+  uploadFolder: D://uploadFiles/
+  previewPath: http://127.0.0.1:8080/image/
+web:
+  upload-path: D://uploadFiles/
   

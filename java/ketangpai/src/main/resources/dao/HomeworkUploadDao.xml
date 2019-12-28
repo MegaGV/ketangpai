@@ -17,8 +17,42 @@
 	</resultMap>
 	
 	<select id="getHomeworkUploadById" resultType="ketangpai.entity.Homework_upload">
-		select * from homework_upload where student = #{id} AND homework = #{hid}
+		select * from homework_upload where student = #{student} AND homework = #{homework}
 	</select>
 	
+	<select id="getHomeworkUpload" resultType="ketangpai.entity.Homework_upload">
+		select * from homework_upload where id = #{id}
+	</select>
+	
+	<select id="getHomeworkAllUpload" resultType="ketangpai.entity.Homework_upload">
+		select * from homework_upload where homework = #{id}
+	</select>
+	
+	<insert id="createHomework_upload" parameterType="ketangpai.entity.Homework_upload"  useGeneratedKeys="true" keyProperty="id">
+		insert into homework_upload
+		<trim prefix="(" suffix=")" suffixOverrides="," >
+			student, homework
+		</trim>
+		<trim prefix="values (" suffix=")" suffixOverrides="," >
+			#{student, jdbcType=INTEGER},
+			#{homework, jdbcType=INTEGER}
+		</trim>
+	</insert>
+	
+	<update id="Scoring">
+		update homework_upload set
+		score = #{score},
+		review = 1
+		where id = #{id}
+	</update>
+	
+	<update id="submitHomeworkUpload" parameterType="ketangpai.entity.Homework_upload">
+		update homework_upload set
+		content = #{content},
+		<if test="file != null" >file = #{file},</if>
+		complete = 1,
+		upload_date = #{upload_date}
+		where id = #{id}
+	</update>
 	
 </mapper>

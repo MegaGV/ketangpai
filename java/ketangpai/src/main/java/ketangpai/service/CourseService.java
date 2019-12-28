@@ -19,4 +19,6 @@ public interface CourseService {
 	public List<User> getCourseStudents(Integer id);
 	
 	public void createCourse(Course course);
+	public void editCourse(Course course);
+	public void deleteCourse(Integer id, Integer cid);
 }

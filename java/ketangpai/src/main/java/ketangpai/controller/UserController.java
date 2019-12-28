@@ -41,4 +41,10 @@ public class UserController {
 		return user;
 	}
 	
+	@GetMapping("/getUserName")
+	public String getUserName(Integer id) {
+		return service.getUserName(id);
+	}
+	
+	
 }

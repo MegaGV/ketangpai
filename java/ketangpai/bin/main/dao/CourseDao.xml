@@ -42,11 +42,23 @@
 		select students from course where id = #{id}
 	</select>
 	
+	<select id="getCourseHomeworks" resultType="java.lang.String">
+		select homeworks from course where id = #{id}
+	</select>
+	
 	<update id="updateCourseStudents" >
 		update course set
 		students = #{students}
 		where id = #{id}
 	</update>
+	
+	<update id="updateCourseHomeworks" >
+		update course set
+		homeworks = #{homeworks}
+		where id = #{id}
+	</update>
+	
+	
 	
 	<insert id="createCourse" parameterType="ketangpai.entity.Course" useGeneratedKeys="true" keyProperty="id">
 		insert into course 
@@ -60,5 +72,17 @@
 			#{teacher, jdbcType=INTEGER}
 		</trim>
 	</insert>
+	
+	<update id="editCourse" parameterType="ketangpai.entity.Course">
+		update course set
+		name = #{name},
+		introduce= #{introduce},
+		code = #{code}
+		where id = #{id}
+	</update>
+	
+	<delete id="deleteCourse" parameterType="java.lang.Integer">
+		delete from course where id = #{id}
+	</delete>
 	
 </mapper>

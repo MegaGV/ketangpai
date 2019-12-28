@@ -40,13 +40,18 @@
             </div>
 
             <div class="homework_upload_top2">
-                <el-button type="primary" style="position:relative;right:720px" :disabled="upload.file == ''">提交</el-button>
+                <el-button type="primary" style="position:relative;right:720px" @click="submit">提交</el-button>
                 <p style="float:right;margin:0" v-if="iscomplete">已完成</p>
                 <p style="float:right;margin:0" v-else>未完成</p>
             </div>
 
             <el-form class="homework_upload_box">
-                <el-upload class="upload-demo" action="https://jsonplaceholder.typicode.com/posts/" multiple>
+                <el-upload class="upload-demo" 
+                    action="http://127.0.0.1:8080/file/upload"
+                    :file-list="file"
+                    :limit="1"
+                    :on-success="handleAvatarSuccess"
+                    >
                     <div class="uploadbox">
                         <i class="el-icon-circle-plus" style="font-size:35px;color:rgba(50,186,240,1);position:relative;right:140px;top:20px"></i>
                         <div class="el-upload__text" style="position:relative;right:70px;bottom:20px">添加作业文件</div>
@@ -55,7 +60,7 @@
                 </el-upload>
                 <div class="message" >
                     <span style="line-height:38px;font-size: 14px;color: #010000;float: left;">作业留言:</span>
-                    <el-input :disabled="upload.review == '1'" type="textarea" v-model="upload.content" 
+                    <el-input type="textarea" v-model="upload.content" 
                     placeholder="添加留言，作业要以附件的形式提交，而不是写在留言里..." 
                     style="width:1000px;line-height: 38px;border: 1px solid #D2D2D2;">
                     </el-input>
@@ -86,7 +91,9 @@ export default {
             user:{},
             course:{},
             homework:{},
-            upload:{}
+            upload:{},
+            file: [],
+
         }
     },
     computed: {
@@ -144,6 +151,19 @@ export default {
             })
             .catch(err => {
                 alert("获取作业上传情况失败");
+                console.log(err);
+            })
+        },
+        handleAvatarSuccess(res, file) {
+            this.upload.file = URL.createObjectURL(file.raw);
+        },
+        submit(){
+            this.$axios.post('api/HomeworkUploadController/submitHomeworkUpload', this.upload)
+            .then(res => {
+                alert("上传成功")
+            })
+            .catch(err => {
+                alert("上传失败");
                 console.log(err);
             })
         },
