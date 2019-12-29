@@ -11,7 +11,7 @@
             <el-dialog :visible.sync="new_homework_visible" width="30%">
                 <el-form ref="homework" :model="homework">
                     <el-form-item>
-                        <el-input v-model="homework.name" placeholder="课程名称"></el-input>
+                        <el-input v-model="homework.name" placeholder="作业名称"></el-input>
                     </el-form-item>
                     <el-form-item>
                         <el-input type="textarea" :rows="3" v-model="homework.introduce" placeholder="作业简介，作业格式等要求"></el-input>

@@ -144,10 +144,14 @@ export default {
             coursebk:{backgroundImage: "url(" + require("../img/04.png") + ")",},
             fieldcoursebk:{backgroundImage: "url(" + require("../img/10.jpg") + ")",},
             joinbk:{backgroundImage: "url(" + require("../img/create-course.png") + ")",},
+            
             fieldsort_visible:false,
             fieldsort_part:"",
+
             field_visible:false,
+
             readytofile:"",
+            
             user:{},
             courses:[],
             fieldcourses: [],

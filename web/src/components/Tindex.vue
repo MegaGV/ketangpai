@@ -362,7 +362,6 @@ export default {
                     })
                 }
             }
-
         },
         logout() {
             this.$confirm('将退出登录, 是否继续?', '提示', {
