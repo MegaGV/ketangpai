@@ -155,7 +155,9 @@ export default {
             })
         },
         handleAvatarSuccess(res, file) {
-            this.upload.file = URL.createObjectURL(file.raw);
+            this.upload.file = res;
+            this.upload.file = this.upload.file[0];
+            alert(this.upload.file)
         },
         submit(){
             this.$axios.post('api/HomeworkUploadController/submitHomeworkUpload', this.upload)

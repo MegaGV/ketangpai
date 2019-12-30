@@ -4,7 +4,7 @@ spring:
   resources:
     static-locations: classpath:/META-INF/resources/,classpath:/static,classpath:/resources/,file:${web.upload-path}
   mvc:
-    static-path-pattern: /image/**
+    static-path-pattern: /**
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
     url: jdbc:mysql://localhost:3306/ketangpai?useUnicode=true&characterEncoding=utf8&allowMultiQueries=true&serverTimezone=UTC
@@ -15,7 +15,7 @@ mybatis:
   mapper-locations: classpath:dao/*Dao.xml
 app:
   uploadFolder: D://uploadFiles/
-  previewPath: http://127.0.0.1:8080/image/
+  previewPath: http://127.0.0.1:8080/
 web:
   upload-path: D://uploadFiles/
   

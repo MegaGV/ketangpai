@@ -31,6 +31,7 @@
                 <p class="homework_upload_info">截至日期：{{homework.endtime}}</p>
                 <p class="homework_upload_info">个人作业</p>
                 <p class="homework_upload_info">需要查重</p>
+                
             </div>
 
             <div class="homework_upload_top2">
@@ -40,12 +41,12 @@
             </div>
 
             <el-form class="homework_upload_box">
+                
                 <el-upload :disabled="true" class="upload-demo" :file-list="this.upload.file">
                     <div class="uploadbox">
-                        <i class="el-icon-circle-plus" style="font-size:35px;color:rgba(50,186,240,1);position:relative;right:140px;top:20px"></i>
-                        <div class="el-upload__text" style="position:relative;right:45px;bottom:20px">学生上传的作业文件</div>
-                        <div class="el-upload__tip" style="position:relative;right:10px;bottom:20px">支持各类文档、图片、代码、压缩包格式</div>
-                    </div>  
+                        <i class="el-icon-download" style="font-size:35px;color:rgba(50,186,240,1);position:relative;right:40px;top:20px"></i>
+                        <a :href="this.upload.file" class="el-upload__text" style="position:relative;top:10px">下载学生上传的作业文件</a>
+                        </div>  
                 </el-upload>
                 <div class="message" >
                     <span style="line-height:38px;font-size: 14px;color: #010000;float: left;">学生留言:</span>
@@ -150,6 +151,9 @@ export default {
             }).then(() => {
                 this.$router.push('/login_page')
             });
+        },
+        download(){
+            window.location.href = this.$root.PROJECT_ + this.upload.file
         },
     },
     mounted(){
